@@ -1,0 +1,454 @@
+/*
+    Admin Name: River
+    Description: Stylesheet for the River Settings Page
+    Author: CodeRiver Labs 
+    Author URI: http://coderiverlabs.com
+    Version: 0.0.0
+
+    License: GNU General Public License v2.0 (or later)
+    License URI: http://www.opensource.org/licenses/gpl-license.php
+*/
+
+/* HTML5 display definitions
+------------------------------------------------------------ */
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+
+#riverframework_important_update.error { display: block !important; }
+#riverframework_update.updated { display: block !important; }
+#theme_update.updated { display: block !important; } /* Except for the theme update notifier */
+
+#river-container  { margin: 30px 15px 2px; width: 95%; position:relative; z-index: 0 }
+
+
+
+/* Header
+------------------------------------------------------------ */
+#river-container #header { 
+    height: 80px; 
+    background-color: #d7e6f2; 
+    border: 1px solid #a4bbcd; 
+    border-top-left-radius: 15px; 
+    -moz-border-radius-topleft: 15px; 
+    -webkit-border-top-left-radius: 15px; 
+    -webkit-border-top-right-radius: 15px; 
+    border-top-right-radius: 15px; 
+    -moz-border-radius-topright: 15px;  
+    /*INSET SHADOW*/
+    -webkit-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+    -moz-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+}
+
+header#header .logo  { float: left; margin: 24px 0 0 25px; height: 35px; }
+header#header .info  { float: right; margin: 26px 25px 0 0; }
+header#header .info span  { 
+    display: block; 
+    line-height: 15px; 
+    text-transform: uppercase; 
+    text-align: right; 
+    color: #4e4e4e; 
+    text-shadow: 1px 1px 0 #fff; 
+}
+header#header .info .page-title  { font-size: 15px; font-weight: bold; }
+header#header .info .page-version  { font-size: 12px; }
+header#header .info b { 
+    font-size: 11px; 
+    text-transform: none; 
+    color: #444; 
+    font-weight: 100; 
+}
+
+/* Support Nav
+------------------------------------------------------------ */
+nav#support { 
+    height: 32px; 
+    padding: 0 0 0 15px; 
+    background-color: #d7e6f2; 
+    border-top: 1px solid #f1f6fa; 
+    border-bottom: 1px solid #a4bbcd; 
+    border-left: 1px solid #d8d8d8; 
+    border-right: 1px solid #d8d8d8; 
+    position: relative;    
+}
+nav#support ul { margin: 0; }
+nav#support ul li  { display: inline; margin: 0 6px 0 0; }
+nav#support ul li a:link, 
+nav#support ul li a:visited  { 
+    line-height: 32px; 
+    font-size: 10px; 
+    font-weight: bold; 
+    text-transform: uppercase; 
+    text-decoration: none; 
+    color: #21759b; 
+    text-shadow: 1px 1px 0 #fff; 
+}
+nav#support ul li a:hover  { color: #155876; }
+nav#support ul li.changelog  { 
+    padding: 2px 0 2px 20px; 
+    background: url( "../images/ico-changelog.png" ) no-repeat left center; 
+}
+nav#support ul li.docs { 
+    padding: 1px 0 1px 20px; 
+    background: url( "../images/ico-docs.png" ) no-repeat left top; 
+}
+
+nav#support ul li.forum { 
+    padding: 1px 0 1px 20px; 
+    background: url( "../images/ico-forum.png" ) no-repeat left top; 
+}
+nav#support ul li.right { float:right; margin-right:15px}
+
+/* Main Section
+------------------------------------------------------------ */
+section#main  { 
+    background-color: #f1f1f1; 
+    border-left: 1px solid #d8d8d8; 
+    border-right: 1px solid #d8d8d8; 
+    border-bottom: 1px solid #d8d8d8;
+    position: relative;
+    overflow: hidden;
+}
+
+#river-container #river-form  { position: relative; }
+
+/* Sections Nav
+------------------------------------------------------------ */
+nav#river-sections { 
+    float: left;
+    z-index: 9999; 
+    width: 145px;
+    position: relative;
+}
+
+nav#river-sections .shadow { 
+    position: absolute; 
+    top: 0; bottom: 0; right: 0; 
+    background: transparent url( "../images/menu-shadow.png" ) repeat-y right top; 
+    width: 6px; 
+    z-index: 20;
+}
+
+nav#river-sections ul { 
+    clear: left;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+nav#river-sections li { margin-bottom:0; position: relative;}
+nav#river-sections ul li a:link, 
+nav#river-sections ul li a:visited  { 
+    display: block; 
+    padding: 7px 10px 7px 10px; 
+    font: bold 12px/18px sans-serif; 
+    text-decoration: none; color: #797979; 
+    border-bottom: 1px solid #d8d8d8; 
+    border-top:1px solid #fff; 
+    text-shadow: 0 1px 0 #fff; 
+}
+nav#river-sections ul li.current a:link, 
+nav#river-sections ul li.current a:visited  {
+    color: #21759b;
+    margin-left: -1px;
+    background-color: #777;
+    background-image: -ms-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -moz-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -o-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -webkit-gradient(linear,left bottom,left top,from(#6d6d6d),to(#808080));
+    background-image: -webkit-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: linear-gradient(bottom,#6d6d6d,#808080);
+    text-shadow: 0 -1px 0 #333;
+    color: white;
+    border-top-color: gray;
+    border-bottom-color: #6D6D6D;
+}
+
+nav#river-sections li .river-menu-arrow   {
+    display: none;
+    top: 1px;
+    cursor: auto;
+    position: absolute;
+    left: -1045px;
+    margin: 0;
+    height: 32px;
+    width: 6px;
+    -moz-transform: translate(146px);
+    -webkit-transform: translate(146px);
+    -o-transform: translate(146px);
+    -ms-transform: translate(146px);
+    transform: translate(146px);
+}
+
+nav#river-sections li .river-menu-arrow div {
+    position: absolute;
+    -moz-transform: matrix(-0.6,1,0.6,1,0,0);
+    -webkit-transform: matrix(-0.6,1,0.6,1,0,0);
+    -o-transform: matrix(-0.6,1,0.6,1,0,0);
+    -ms-transform: matrix(-0.6,1,0.6,1,0,0);
+    transform: matrix(-0.6,1,0.6,1,0,0);
+    height: 17px;
+    width: 17px;
+    top: 7px;
+    left: -2px;
+    border-width: 0 0 1px 1px;
+    border-style: solid;
+    background: #E4E4E4;
+    border-color: #CCC;
+}
+
+nav#river-sections li.current .river-menu-arrow  {
+    display: block;
+    z-index: 9997;
+    -moz-transform: translate(1184px);
+    -webkit-transform: translate(1184px);
+    -o-transform: translate(1184px);
+    -ms-transform: translate(1184px);
+    transform: translate(1184px);
+    background-color: #777;
+    background-image: -ms-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -moz-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -o-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: -webkit-gradient(linear,left bottom,left top,from(#6d6d6d),to(#808080));
+    background-image: -webkit-linear-gradient(bottom,#6d6d6d,#808080);
+    background-image: linear-gradient(bottom,#6d6d6d,#808080);
+}
+
+nav#river-sections ul li.current .river-menu-arrow div {
+    border: none;
+    background-color: #777;
+    background-image: -ms-linear-gradient(right bottom,#6d6d6d,#808080);
+    background-image: -moz-linear-gradient(right bottom,#6d6d6d,#808080);
+    background-image: -o-linear-gradient(right bottom,#6d6d6d,#808080);
+    background-image: -webkit-gradient(linear,right bottom,left top,from(#6d6d6d),to(#808080));
+    background-image: -webkit-linear-gradient(right bottom,#6d6d6d,#808080);
+    background-image: linear-gradient(right bottom,#6d6d6d,#808080);
+}
+
+.admin-color-classic nav#river-sections ul li.current a:link, 
+nav#river-sections ul li.current a:visited  {
+    border-top-color: #5A8FAD;
+    border-bottom-color: #5589AA;
+    background-color: #5589AA;
+    background-image: -ms-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -moz-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -o-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -webkit-gradient(linear,left bottom,left top,from(#5589AA),to(#619bbb));
+    background-image: -webkit-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: linear-gradient(bottom,#5589AA,#619bbb);
+}
+.admin-color-classic nav#river-sections li.current .river-menu-arrow   {
+    background-color: #5589AA;
+    background-image: -ms-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -moz-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -o-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -webkit-gradient(linear,left bottom,left top,from(#5589AA),to(#619bbb));
+    background-image: -webkit-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: linear-gradient(bottom,#5589AA,#619bbb);
+}
+
+.admin-color-classic nav#river-sections ul li.current .arrow div {
+    border: none;
+    background-color: #5589AA;
+    background-image: -ms-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -moz-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -o-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: -webkit-gradient(linear,left bottom,left top,from(#5589AA),to(#619bbb));
+    background-image: -webkit-linear-gradient(bottom,#5589AA,#619bbb);
+    background-image: linear-gradient(bottom,#5589AA,#619bbb);
+}
+
+nav#river-sections ul li a:hover  { color: #D54E21; background-color: #e4e4e4; }
+nav#river-sections ul li.current a:hover  { color: #fff; }
+
+nav#river-sections li ul  { background: #fff; border-bottom: 1px solid #DFDFDF; padding:5px 0; }
+nav#river-sections li ul li { border: none; }
+
+
+/* Content
+------------------------------------------------------------ */
+section#main .content  { position: relative; margin-left: 189px; }
+
+section#main .content  { 
+    float: left; 
+    min-height: 650px; 
+    width: 80%;
+    margin-left: -1px; 
+    padding: 0 20px; 
+    font-family: sans-serif; 
+    background-color: #fff; 
+    border-left: 1px solid #d8d8d8; 
+}
+
+section#main .content .section { 
+    margin-bottom: 10px; 
+    border-bottom: 1px solid #E7E7E7; 
+    padding-bottom:15px; 
+}
+section#main .content .section h3  { 
+    font-size: 1.5em; 
+    margin: 15px 0 5px; 
+    padding: 7px 0px; 
+}
+
+#river-container .content th, td { float: left; width: 90%; }
+#river-container .content th { 
+    font-size: 14px; 
+    font-weight: bold;
+    margin: 20px 0 0 0;
+}
+
+
+/* Content Controls
+------------------------------------------------------------ */
+
+#river-container textarea, 
+#river-container input, 
+#river-container select {
+    -moz-border-radius:4px;
+    -webkit-border-radius:4px;
+    -border-radius:4px;
+    border-style:solid;
+    border-width:1px;
+}
+
+#river-container textarea,
+#river-container input[type="text"], 
+#river-container select { width: 99%; }
+
+#river-container input[type=text], 
+#river-container select { height:28px; }
+
+#river-container input[type="checkbox"], 
+#river-container input[type="radio"] { margin-right: 5px; vertical-align: baseline; }
+
+#river-container input:focus,#river-container select:focus, 
+#river-container textarea:focus { background:#fff;}
+
+/* imgselect */
+
+
+section#main .content div.imgselect {
+    float: left;
+    margin: 0 15px 0 0;
+    width: 345px;
+}
+
+section#main .content div.imgselect input { display: none; }
+
+section#main .content div.imgselect img {
+    border: 3px solid #DEDEDE;
+    border-radius: 3px 3px 3px 3px;
+    cursor: pointer;
+    display: none;
+    margin: 0 5px 10px 0;
+}
+section#main .content div.imgselect .selected img {
+    border: 3px solid #000000;
+    border-radius: 3px 3px 3px 3px;
+}
+
+section#main .content .imgselect label.imgselect {
+    display: block;
+    float: left;
+}
+
+/* upload-url */
+section#main .content .upload-url {
+    max-width: 70%;
+    margin-right: 10px;
+}
+
+section#main .content div#image-preview {
+    float: left;
+    margin-left: 1px;
+    margin-top: 3px;
+    position: relative;
+    width: 344px;
+    z-index: 1;
+}
+
+section#main .content div#image-preview img {
+    background: none repeat scroll 0 0 #FAFAFA;
+    border-color: #CCCCCC #EEEEEE #EEEEEE #CCCCCC;
+    border-style: solid;
+    border-width: 1px;
+    float: left;
+    max-width: 334px;
+    padding: 4px;
+}    
+
+section#main .content div#image-preview a {
+    background: url("../images/ico-delete.png") no-repeat scroll 0 0 transparent;
+    border: medium none;
+    bottom: -4px;
+    display: block;
+    float: left;
+    height: 16px;
+    left: -4px;
+    padding: 0;
+    position: absolute;
+    text-indent: -9999px;
+    width: 16px;
+}
+
+/* Footer
+------------------------------------------------------------ */
+#river-container footer#save-reset { 
+    background: #f3f3f3; 
+    border:solid #ccc; 
+    border-width:0px 1px 1px 1px; 
+    padding: 10px 20px 0px 20px; 
+    height: 35px; 
+    text-align: right;
+    
+    /*INSET SHADOW*/
+    -webkit-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+    -moz-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+}
+
+#river-container footer#save-reset #reset { float: left; }
+#river-container footer#save-reset #submit { float: right; }
+#river-container .river-save-popup { position:absolute; -moz-border-radius:12px; background:rgba(0,0,0,0.4); color:#fff; font-size:24px; text-align:center; display:none; z-index: 10; }
+
+#river-container .river-save-save { background:url( ../images/happy.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
+#river-container .river-save-reset { background:url( ../images/warning.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
+#river-container .river-save-error { background:url( ../images/warning.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
+
+.reset-button { color:#c77!important;text-shadow:0 1px 0 #fff !important;}
+.reset-button:hover { border-color:#c77!important;}
+
+/*-------------------------------------------------------------------------------------------*/
+/* GENERAL STYLES */
+/*-------------------------------------------------------------------------------------------*/
+
+/* http://sonspring.com/journal/clearing-floats */
+
+html body * span.clear,
+html body * div.clear,
+html body * li.clear,
+html body * dd.clear
+{
+	background: none;
+	border: 0;
+	clear: both;
+	display: block;
+	float: none;
+	font-size: 0;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+
+/* Contain floats: h5bp.com/q */
+.clearfix:before, .clearfix:after { content: ""; display: table; }
+.clearfix:after { clear: both; }
+.clearfix { *zoom: 1; }
+.hide {display:none}
