@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Page Class
- * @since       0.0.0
+ * @since       0.0.1
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -164,11 +164,8 @@ if ( isset( $this->form['site_url'] ) ) {
                     );
 
 
-            printf( '<input id="%1$s" class="button reset-button" type="button" value="%2$s" onclick="%3$s">', 
-                    sprintf( '%s[%s]', 
-                            $this->settings_group, 
-                            $this->default_settings['reset']['id'] ),
-                    $this->default_settings['reset']['title'],
+            printf( '<input id="reset" class="button reset-button" type="button" value="%1$s" onclick="%2$s">', 
+                    $this->form['button_reset_text'],
                     'return river_confirm(\'' . 
                         esc_js( __( 'Are you sure you want to reset? ' ) )
                         . '\n' .

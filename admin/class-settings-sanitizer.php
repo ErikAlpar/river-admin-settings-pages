@@ -5,14 +5,18 @@
  *
  * @category    River 
  * @package     Framework Admin
- * @subpackage  Validate Sanitize
- * @since       0.0.0
+ * @subpackage  Settings Sanitizer
+ * @since       0.0.1
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
  * 
  */
 
+/**
+ * Credits:     This code was inspired by the Genesis code and the work that
+ *              Mark Jaquith did in Genesis_Settings_Sanitizer.
+ */
 if ( !class_exists( 'River_Settings_Sanitizer' ) ) :
 /**
  * Class for validating and sanitizing both settings for the Admin Settings
@@ -21,9 +25,8 @@ if ( !class_exists( 'River_Settings_Sanitizer' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.0
+ * @since       0.0.1
  * 
- * @link    http://wordpress.stackexchange.com/questions/13539/what-are-security-best-practices-for-wordpress-plugins-and-themes
  */
 abstract class River_Settings_Sanitizer extends River_Admin {
     
@@ -57,7 +60,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * and 'river_default_validator_filters' to let child themes and plugins add
      * their own filters.
      *
-     * @since 0.0.0
+     * @since 0.0.1
      *
      */
     protected function setup_filter_defaults() {
@@ -80,15 +83,14 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                 array(
                     'absint'            => array(),        
                     'boolean'           => array(), 
-                    'boolean_multi'     => array( 'imgselect', 'multicheck', 'radio', 'select'),
-                    'date_format'       => array( 'datepicker' ),        
-                    'descr_name'        => array( 'textarea' ),
-                    'email'             => array(),        
+                    'boolean_multi'     => array(),
+                    'datetime_format'   => array( 'datepicker', 'timepicker' ),        
+                    'email'             => array( 'email' ),        
                     'hex'               => array( 'colorpicker' ),
                     'integer'           => array(),
                     'numeric'           => array(),
-                    'string'            => array( 'text' ),
-                    'time_format'       => array( 'timepicker' ),
+                    'string'            => array( 'text', 'textarea' ),
+                    'string_choices'    => array( 'imgselect', 'multicheck', 'radio', 'select' ),
                     'url'               => array( 'upload-image', 'siteurl' ),
                     'zero_one'          => array( 'checkbox', 'button' ),
                 )
@@ -109,8 +111,6 @@ abstract class River_Settings_Sanitizer extends River_Admin {
          * a callback when we register the setting (register_setting) or
          * add to the filter "sanitize_option_{$option_name}.  Here we are
          * adding a filter and the sanitizer is in this class
-         * 
-         * @link http://wordpress.stackexchange.com/questions/61024/default-wordpress-settings-api-data-sanitization
          */
         add_filter( 'sanitize_option_' . $this->settings_group, array( $this, 'sanitizer' ), 10, 2 );
 
@@ -122,7 +122,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * Sanitize a value, via the sanitization filter type associated with an
      * option.
      *
-     * @since 0.0.0
+     * @since 0.0.1
      *
      * @param mixed $new_value New value
      * @param string $option Name of the option
@@ -153,6 +153,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                 $old_value[$key] = isset( $old_value[$key] ) ? $old_value[$key] : '';
                 $new_value[$key] = isset( $new_value[$key] ) ? $new_value[$key] : '';
                 
+                // This option is an array
                 if ( is_array( $new_value[$key] ) ) {
                     
                     if ( isset( $new_value[$key] ) ) {
@@ -163,7 +164,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
 
                             $temp_new_value[$sub_key] = $this->do_validator_filter( 
                                     $setting['validator_filter'], 
-                                    $sub_value, $old_value[$key], $key );
+                                    $sub_value, $old_value[$key], $sub_key, $key );
 
                             if( $temp_new_value == $old_value[$key] )
                                 break;
@@ -180,15 +181,16 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                         $new_value[$key] = $temp_new_value;
                     }
                     
+                // This option is not an array    
                 } else {
                     
                     // if the new value = old value, then no need to validate
-                    if( ( $new_value[$key] != $old_value[$key] ) && 
-                            ( gettype( $new_value[$key] ) == gettype( $old_value[$key] ) ) )
+                    if( ( $new_value[$key] != $old_value[$key] ) || 
+                            ( gettype( $new_value[$key] ) != gettype( $old_value[$key] ) ) )
                         // Pass through the validator filter first and store updated value
                         $new_value[$key] = $this->do_validator_filter( 
                                 $setting['validator_filter'], 
-                                $new_value[$key], $old_value[$key], $key );
+                                $new_value[$key], $old_value[$key], $new_value[$key], $key );
                     
                     // Pass through the sanitizer filter and store updated value
                     $new_value[$key] = $this->do_sanitizer_filter( 
@@ -208,14 +210,15 @@ abstract class River_Settings_Sanitizer extends River_Admin {
     
     /**
      * Checks sanitization filter exists, and if so, passes the value through it.
+     * 
+     * @uses call_user_func() to provide the callback to assigned filter
      *
      * @since 0.0.0
      *
-     * @param string $filter Sanitization filter type
-     * @param string $new_value New value
-     * @param string $old_value Previous value
-     * @return mixed Returns filtered value, or submitted value if value is
-     * unfiltered.
+     * @param string    $filter Sanitizer filter type
+     * @param string    $new_value New value
+     * @param string    $old_value Current value in the options database
+     * @return mixed    Returns filtered value
      */
     protected function do_sanitizer_filter( $filter, $new_value, $old_value ) {
 
@@ -223,25 +226,22 @@ abstract class River_Settings_Sanitizer extends River_Admin {
 
         if ( ! in_array( $filter, array_keys( $available_filters ) ) )
             return $new_value;
-        /**
-         * call_user_func call the callback given by the first parameter
-         * call_user_func( callable $callback, $param [, $param ] )
-         * @link http://php.net/manual/en/function.call-user-func.php
-         */
+
+        // Callback to the assigned filter
         return call_user_func( $available_filters[$filter], $new_value, $old_value );
 
     }
 
     /**
-     * Return array of known sanitization filter types.
+     * Return array of known sanitizer filter types.
      *
      * Array can be filtered via 'river_available_sanitizer_filters' to let
      * child themes and plugins add their own sanitization filters.
      *
      * @since 0.0.0
      *
-     * @return array Array with keys of sanitization types, and values of the
-     * filter function name as a callback
+     * @return array    Associative array containing the sanitizer filter types
+     *                  as the keys and filter method callback as the values
      */
     function get_available_sanitizer_filters() {
 
@@ -259,41 +259,39 @@ abstract class River_Settings_Sanitizer extends River_Admin {
     /** Validator Filter ******************************************************/  
     
     /**
-     * Checks validatr filter exists, and if so, passes the value through it.
+     * Checks validation filter exists, and if so, passes the value through it.
+     * 
+     * @uses call_user_func() to provide the callback to assigned filter
      *
      * @since 0.0.0
      *
-     * @param string $filter Sanitization filter type
-     * @param string $new_value New value
-     * @param string $old_value Previous value
-     * @return mixed Returns filtered value, or submitted value if value is
-     * unfiltered.
+     * @param string    $filter Validator filter type
+     * @param string    $new_value New value
+     * @param string    $old_value Current value in the options database
+     * @return mixed    Returns filtered value
      */
-    protected function do_validator_filter( $filter, $new_value, $old_value, $key ) {
+    protected function do_validator_filter( $filter, $new_value, $old_value, $options_key, $key ) {
 
         $available_filters = $this->get_available_validator_filters();
 
         if ( ! in_array( $filter, array_keys( $available_filters ) ) )
             return $new_value;
-        /**
-         * call_user_func call the callback given by the first parameter
-         * call_user_func( callable $callback, $param [, $param ] )
-         * @link http://php.net/manual/en/function.call-user-func.php
-         */
-        return call_user_func( $available_filters[$filter], $new_value, $old_value, $key );
+        
+        // Callback to the assigned filter
+        return call_user_func( $available_filters[$filter], $new_value, $old_value, $options_key, $key );
 
     }
 
     /**
-     * Return array of known sanitization filter types.
+     * Return array of known validator filter types.
      *
-     * Array can be filtered via 'river_available_sanitizer_filters' to let
+     * Array can be filtered via 'river_available_validator_filters' to let
      * child themes and plugins add their own sanitization filters.
      *
-     * @since 0.0.0
+     * @since 0.0.1
      *
-     * @return array Array with keys of sanitization types, and values of the
-     * filter function name as a callback
+     * @return array    Associative array containing the validator filter types
+     *                  as the keys and filter method callback as the values
      */
     function get_available_validator_filters() {
 
@@ -301,17 +299,16 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                 'absint'            => array( $this, 'v_absint'         ),
                 'boolean'           => array( $this, 'v_boolean'        ),
                 'boolean_multi'     => array( $this, 'v_boolean_multi'  ),
-                'date_format'       => array( $this, 'v_date_format'    ),        
-                'descr_name'        => array( $this, 'v_descr_name'     ),
+                'date_format'       => array( $this, 'v_datetime_format'),        
                 'email'             => array( $this, 'v_email'          ),        
                 'hex'               => array( $this, 'v_hex'            ),
                 'integer'           => array( $this, 'v_integer'        ),
                 'numeric'           => array( $this, 'v_numeric'        ),
                 'string'            => array( $this, 'v_string'         ),
-                'time_format'       => array( $this, 'v_time_format'    ),
+                'string_choices'    => array( $this, 'v_string_choices' ),            
                 'url'               => array( $this, 'v_url'            ),
                 'zero_one'          => array( $this, 'v_zero_one'       ),            
-        );
+        );        
 
         return apply_filters( 'river_available_validator_filters', $default_filters );
                 
@@ -320,17 +317,15 @@ abstract class River_Settings_Sanitizer extends River_Admin {
 
     /** Sanitizer Filter Methods **********************************************/    
 
-    // Now, our filter methods
-
     /**
-     * Returns a 1 or 0, for all truthy / falsy values.
+     * Returns a 0 or 1
      *
-     * Uses double casting. First, we cast to bool, then to integer.
+     * Uses double casting. First, we cast to boolean, then to integer.
      *
-     * @since 1.7.0
+     * @since 0.0.0
      *
-     * @param mixed $new_value Should ideally be a 1 or 0 integer passed in
-     * @return integer 1 or 0.
+     * @param mixed     $new_value Should ideally be a 0 or 1 integer passed in
+     * @return integer  1 or 0.
      */
     function zero_one( $new_value ) {        
 
@@ -341,10 +336,10 @@ abstract class River_Settings_Sanitizer extends River_Admin {
     /**
      * Removes HTML tags from string.
      *
-     * @since 1.7.0
+     * @since 0.0.0
      *
-     * @param string $new_value String, possibly with HTML in it
-     * @return string String without HTML in it.
+     * @param string    $new_value String, possibly with HTML in it
+     * @return string   String without HTML in it.
      */
     function no_html( $new_value ) {
 
@@ -355,10 +350,10 @@ abstract class River_Settings_Sanitizer extends River_Admin {
     /**
      * Removes unsafe HTML tags, via wp_kses_post().
      *
-     * @since 1.7.0
+     * @since 0.0.0
      *
-     * @param string $new_value String with potentially unsafe HTML in it
-     * @return string String with only safe HTML in it
+     * @param string    $new_value String with potentially unsafe HTML in it
+     * @return string   String with only safe HTML in it
      */
     function safe_html( $new_value ) {
 
@@ -369,13 +364,16 @@ abstract class River_Settings_Sanitizer extends River_Admin {
     /**
      * Keeps the option from being updated if the user lacks unfiltered_html
      * capability.
+     * 
+     * @uses current_user_can( $capability )
+     * 
+     * @since 0.0.0
      *
-     * @since 1.7.0
-     *
-     * @param string $new_value New value
-     * @param string $old_value Previous value
-     * @return string New or previous value, depending if user has correct
-     * capability or not.
+     * @param string    $new_value New value
+     * @param string    $old_value Current value in the options database
+     * @return string   Returns unfiltered new value if user has the
+     *                  capability; else returns the old value.
+     * @link http://codex.wordpress.org/Function_Reference/current_user_can
      */
     function requires_unfiltered_html( $new_value, $old_value ) {
 
@@ -390,40 +388,106 @@ abstract class River_Settings_Sanitizer extends River_Admin {
 
     /** Validator Filter Methods **********************************************/
     
+    /**
+     * Absolute integer value (non-negative integers) validation
+     * 
+     * @uses absint( $maybeint )
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param +integer  $old_value Current value in options database
+     * @return +integer If new value is numeric, returns absolute integer value
+     *                  of new value; else returns the old value 
+     * @link http://codex.wordpress.org/Function_Reference/absint
+     */
     function v_absint( $new_value, $old_value ) {
         
+        if ( is_string( $new_value ) )
+            $new_value = trim( $new_value );
+        
+        return is_numeric ( $new_value ) ? absint( $new_value ) : $old_value;       
+        
     }
     
+    /**
+     * Boolean (TRUE, FALSE, 0, 1) validation
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param bool|int  $old_value Current value in options database
+     * @return bool|int If new value is boolean or integer and equal to 0 or 1,
+     *                  returns new value; else returns the old value 
+     */    
     function v_boolean( $new_value, $old_value ) {
         
-        $new_value = is_string( $new_value ) ? (bool) trim( $new_value ) : '';
+        if ( is_string( $new_value ) )
+            $new_value = trim( $new_value );
         
-        return is_bool( $new_value ) ? $new_value : $old_value;
+        $new_value = is_numeric( $new_value ) ? (int) $new_value : $new_value;
+        
+        return is_bool( $new_value )|| 
+            ( ( is_integer( $new_value ) && $new_value == 0 || $new_value == 1 ) ) ? 
+            $new_value : $old_value;
         
     }
     
-    function v_boolean_multi( $new_value, $old_value, $id ) {
+    /**
+     * Boolean (TRUE, FALSE, 0, 1) validation for multi-boolean field types
+     * 
+     * First it checks that the option's key exists in the default setting's
+     * choices array.  If yes, then it calls v_boolean to validate the new value.
+     * Else, it returns the old value.
+     * 
+     * @uses v_boolean()
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param bool|int  $old_value Current value in options database
+     * @param string    $option_key This option's key name (used to see if it
+     *                  exists in the default setting's choices array.
+     * @param string    $id Option's id in the default settings
+     * @return bool|int If new value is boolean or integer and equal to 0 or 1,
+     *                  returns new value; else returns the old value 
+     */     
+    function v_boolean_multi( $new_value, $old_value, $option_key, $id ) {
+        
+        return array_key_exists( $option_key, $this->default_settings[$id]['choices'] ) ? 
+                $this->v_boolean($new_value, $old_value) : $old_value;
+        
+    }      
+    
+    /**
+     * Date and/or time format validation
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value returns a timestamp, returns the new
+     *                  value; else returns the old value 
+     */     
+    function v_datetime_format( $new_value, $old_value ) {
         
         $new_value = is_string( $new_value ) ? trim( $new_value ) : '';
         
-        return array_key_exists( $new_value, $this->default_settings[$id]['choices'] ) ? $new_value : $old_value;
-        
-    } 
-    
-    function v_date_format( $new_value, $old_value ) {
-        
-        return $new_value;
+        return strtotime($new_value) ? $new_value : $old_value;
     }
     
-    function v_descr_name( $new_value, $old_value ) {
-        
-        if( ! isset( $new_value ) )
-            return $new_value;         
-        
-        return is_string( $new_value ) ? trim( $new_value ) : $old_value;        
-        
-    }
-    
+    /**
+     * Email validation
+     * 
+     * @uses is_email()
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value returns a timestamp, returns the new
+     *                  value; else returns the old value 
+     * @link http://codex.wordpress.org/Function_Reference/is_email
+     */     
     function v_email( $new_value, $old_value ) {
         
         if( ! isset( $new_value ) )
@@ -434,57 +498,155 @@ abstract class River_Settings_Sanitizer extends River_Admin {
         return is_email( $new_value ) ? sanitize_email( $new_value ) : $old_value;
         
     } 
-    function v_hex( $new_value, $old_value ) {
-        
-        $new_value = is_string( $new_value ) ? trim( $new_value ) : '';
-        
-        return is_integer( hexdec( $new_value ) ) ? $new_value : $old_value;
-    }
     
+    /**
+     * Hexadecimal validation
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @param bool      $return_empty (opt) TRUE: returns the new vale if
+     *                  it's empty; FALSE: old value is returned
+     * @return string   If new value is in hex, returns the new
+     *                  value; else returns the old value 
+     */     
+    function v_hex( $new_value, $old_value, $return_empty = TRUE ) {
+
+        if ( $return_empty && empty ($new_value) )
+            return $new_value;
+        
+        return ctype_xdigit( $new_value ) ? $new_value : $old_value;
+    } 
+    
+    /**
+     * Integer validation
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value is an integer, returns the new
+     *                  value; else returns the old value 
+     */     
     function v_integer( $new_value, $old_value ) {
         
-        $new_value = is_string( $new_value ) ? (int) trim( $new_value ) : '';
+        if ( is_string( $new_value ) )
+            $new_value = trim( $new_value );
         
-        return is_integer( $new_value ) ? (int) $new_value : $old_value;
+        if( is_numeric( $new_value ) )
+            $new_value = (int) $new_value;
+        
+        return is_integer( $new_value ) ? $new_value : $old_value;
         
     }
     
+    /**
+     * Numeric validation
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value is numeric, returns the new
+     *                  value; else returns the old value 
+     */     
     function v_numeric( $new_value, $old_value ) {
         
-        $new_value = is_string( $new_value ) ? trim( $new_value ) : '';
+        if ( is_string( $new_value ) )
+            $new_value = trim( $new_value );
         
         return is_numeric( $new_value ) ? $new_value : $old_value;
         
     } 
+    
+    /**
+     * String validation
+     * 
+     * @since 0.0.0
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value is a string, returns the new
+     *                  value; else returns the old value 
+     */     
     function v_string( $new_value, $old_value ) {
         
         return is_string( $new_value ) ? trim( $new_value ) : $old_value;
         
     }
     
-    function v_time_format( $new_value, $old_value ) {
-        
-        $new_value = is_string( $new_value ) ? trim( $new_value ) : '';
-        
-        $regex = "/^([1-9]|1[0-2]|0[1-9]){1}(:[0-5][0-9][aApP][mM]){1}$/";
-                
-        return preg_match($regex, $new_value ) ? $new_value : $old_value;
-        
-    }
     
-    function v_url( $new_value, $old_value ) {
+    /**
+     * Choices validation - validating the new value is in the default settings'
+     * choices for this option.
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @param string    $option_key This option's key name (used to see if it
+     *                  exists in the default setting's choices array.
+     * @param string    $id Option's id in the default settings
+     * @return string   If new value is a string and it's key is in the
+     *                  default settings choices array, returns new value;
+     *                  else returns the old value 
+     */     
+    function v_string_choices( $new_value, $old_value, $option_key, $id ) {
         
-        if( empty( $new_value ) )
-            return $new_value;        
+        if( ! is_string( $new_value) )
+            return $old_value;
         
-        $new_value = is_string( $new_value ) ? trim( $new_value ) : '';
+        return array_key_exists( $option_key, $this->default_settings[$id]['choices'] ) ? 
+                $new_value : $old_value;
         
-        return preg_match( '#http(s?)://(.+)#i', $new_value ) ? $new_value : $old_value;
+    }    
+    
+    /**
+     * URL validation
+     * 
+     * Because of the complexities of an URL, we are only testing the
+     * 
+     * 
+     * @since 0.0.0
+     * 
+     * @param string    $new_value New value to validate
+     * @param string    $old_value Current value in options database
+     * @return string   If new value is an integer, returns the new
+     *                  value; else returns the old value 
+     */     
+    function v_url( $new_value, $old_value, $return_empty = TRUE ) {
+        
+        if ( is_string( $new_value ) ) {
+            $new_value = trim( $new_value );
+            
+            if ( $return_empty && empty( $new_value) )
+                return $new_value;
+            
+        } else {
+            return $old_value;
+        }
+        
+        return (bool) preg_match( '#http(s?)://(.+)#i', $new_value ) ? $new_value : $old_value;
     } 
     
+    /**
+     * Zero One (0, 1) validation
+     * 
+     * Use this one when you want just an integer back and not true or false bool.
+     * 
+     * @since 0.0.1
+     * 
+     * @param string    $new_value New value to validate
+     * @param bool|int  $old_value Current value in options database
+     * @return int      If new value is boolean or integer and equal to 0 or 1,
+     *                  returns new value in int; else returns the old value 
+     */     
     function v_zero_one( $new_value, $old_value ) {
         
-        return 0 == (int) $new_value || 1 == (int) $new_value ? (int) $new_value : $old_value;
+        $new_value = $this->v_boolean( $new_value, $old_value );
+        
+        return is_bool($new_value) ? (int) $new_value : $new_value;
         
     }      
 

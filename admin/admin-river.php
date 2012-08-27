@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin River
- * @since       0.0.0
+ * @since       0.0.1
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -43,6 +43,7 @@ function river_settings_menu_page() {
             'forum_url'         => '/support/forums/',
             // Save button text
             'button_save_text'  => __( 'Save All Changes', 'river' ),
+            'button_reset_text' => __( 'Reset All Options', 'river' ),
             'help_file'         => RIVER_ADMIN_DIR . '/views/river-settings-help.php',
         ),
         'page_config' => array(
@@ -74,20 +75,7 @@ function river_settings_menu_page() {
         ), 
         'default_settings' => array()
     );
- 
-    $config['default_settings']['reset'] = array(
-        // settings ID for settings array & HTML element
-        'id'                => 'reset',
-        // element's label
-        'title'             => __( 'Reset All Options', 'river' ),
-        // (opt) description displayed under the element
-        'desc'              => '',
-        // element's default value
-        'default'           => 0,
-        // HTML element type
-        'type'              => 'button',
-        'section_id'        => '',
-    );   
+
 
     /** General Section *******************************************************/
     $config['default_settings']['example_text'] = array(
@@ -543,21 +531,7 @@ function river_seo_submenu() {
         ), 
         'default_settings' => array()
     );
- 
-    $config['default_settings']['reset'] = array(
-        // settings ID for settings array & HTML element
-        'id'                => 'reset',
-        // element's label
-        'title'             => __( 'Reset All Options', 'river' ),
-        // (opt) description displayed under the element
-        'desc'              => '',
-        // element's default value
-        'default'           => 0,
-        // HTML element type
-        'type'              => 'button',
-        // section these are assigned to
-        'section_id'        => '',
-    );                 
+                 
 
     /** General Section *******************************************************/
     $config['default_settings']['example_text'] = array(
@@ -774,22 +748,7 @@ function river_theme_options() {
             'appearance'        => __( 'Appearance', 'river')
         ), 
         'default_settings' => array()
-    );
- 
-    $config['default_settings']['reset'] = array(
-        // settings ID for settings array & HTML element
-        'id'                => 'reset',
-        // element's label
-        'title'             => __( 'Reset All Options', 'river' ),
-        // (opt) description displayed under the element
-        'desc'              => '',
-        // element's default value
-        'default'           => 0,
-        // HTML element type
-        'type'              => 'button',
-        // section these are assigned to
-        'section_id'        => '',
-    );                 
+    );             
 
     /** General Section *******************************************************/
     $config['default_settings']['example_text'] = array(

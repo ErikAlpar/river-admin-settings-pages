@@ -92,13 +92,16 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
         if ( ! river_is_menu_page( $this->page_id ) )
             return;
         
-        if ( isset( $_REQUEST['page'] ) ) {
+        if ( isset( $_REQUEST['page'] ) && $_REQUEST['page'] == $this->page_id ) {
             
             if( isset( $_REQUEST['reset'] ) ) {
+
+                $options = get_option( $this->settings_group );
                 
-                update_option( $this->settings_group, $this->defaults ) ?
-                    '' :
-                    river_admin_redirect( $this->page_id, array( 'error' => 'true' ) );                  
+                if( $options !== $this->defaults )       
+                    update_option( $this->settings_group, $this->defaults ) ?
+                        '' :
+                        river_admin_redirect( $this->page_id, array( 'error' => 'true' ) );                  
             } 
         }
     }
@@ -397,12 +400,15 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
        
         if ( empty( $this->defaults ) )
             return FALSE;
+        
+        $options = get_option( $this->settings_group );
+         
         /**
-         * update_option() first checks to see if the option already exists
-         * in the options database.  If no, then it adds the new option; 
-         * else, it updates the existing option.
+         * Only update the options database if the default settings are
+         * not equal to what is already in the db
          */
-        return update_option( $this->settings_group, $this->defaults ); 
+        return $options === $this->defaults ? TRUE : 
+            update_option( $this->settings_group, $this->defaults ); 
 
     } 
     
@@ -482,11 +488,9 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
 
                 });
                 
-                form.children('footer').find('input.reset-button').on("click", function() {
+                form.children('footer').find('input.reset-button').on("click", function() {                  
                     url = '?page=<?php echo $this->page_id?>&reset=true';
-                    window.location =  url;                   
-                    //location.reload();
-                    //ajaxSave( 'reset', form.serialize() );
+                    window.location =  url; 
                 });
                 
                 //Save everything else
@@ -644,31 +648,7 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
    
         river_admin_display_settings( $this->settings_group, $setting );
     }
-    
-    /**
-     * Callback function for register_setting() to sanitize options' values.
-     * 
-     * Validate and whitelist user-input data before updating the options
-     * database.  Only whitelisted options are passed back to the database,
-     * and user-input data for all whitelisted options are santized.
-     *
-     * @since 0.0.0
-     * 
-     * @param array     $input  Incoming raw user-input data
-     * @return array    $input  Sanitized user-input data passed back to the
-     *                          database
-     * 
-     * @link http://codex.wordpress.org/Data_Validation
-     * @link http://wordpress.stackexchange.com/questions/61024/default-wordpress-settings-api-data-sanitization
-     */
-    public function sanitizer_callback( $input ) {
-//        return $input;
-        
-        $old_value = get_option( $this->settings_group );
 
-        return $this->validate_sanitize( $input, $old_value );
-  
-    } 
   
     /** Helper Functions ******************************************************/
     

@@ -80,7 +80,15 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
      * @since 0.0.0
      * @var array 
      */
-    protected $available_types = array( 'main_page', 'sub_page', 'theme_page' );
+    protected $available_page_types = array( 'main_page', 'sub_page', 'theme_page' );
+    
+    /**
+     * Default Field Types
+     * 
+     * @since 0.0.1
+     * @var array
+     */
+    protected $available_field_types;
     
     /** Class Methods *********************************************************/    
     
@@ -100,7 +108,7 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
                     'river' ), '$config[\'id\']',  
                     '$config[\'page_config\'][\'id\']' ) );        
 
-        if( array_key_exists( $config['type'], River_Sanitizer::$available_types ) )
+        if( array_key_exists( $config['type'], $this->available_page_types ) )
             wp_die( sprintf( __( 'Invalid page type in %s', 
                     'river' ), '$config[\'type\']' ) ); 
 
@@ -120,6 +128,9 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
         if( ! $this->page_id || ! $this->settings_group || ! $this->page_type )
             return FALSE;
 
+        // Setup the available field types
+        $this->setup_available_field_types();
+        
         $this->form             = $this->form           ? $this->form           : $this->validate_form( $config['form'] );
         $this->page             = $this->page           ? $this->page           : $this->validate_page( $config['page_config'] );
         $this->sections         = $this->sections       ? $this->sections       : $this->validate_sections( $config['sections'] );
@@ -173,7 +184,7 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
         if( ! isset( $type ) || ! is_string( $type ) )
             return '';
         
-        return in_array( $type, $this->available_types ) ? $type : '';
+        return in_array( $type, $this->available_page_types ) ? $type : '';
         
     }
     
@@ -288,7 +299,7 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
      * associative array, we do a deep validation. To ensure the structure is 
      * complete, we pass it through with wp_parse_args()
      * 
-     * @since 0.0.0
+     * @since 0.0.1
      * 
      * @uses wp_parse_args()
      * 
@@ -301,10 +312,18 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
         // If $default_structure is not set, do it now.
         $this->structure_is_set();
         
+        if ( ! isset( $this->available_field_types ) )
+            $this->setup_available_field_types();
+        
         $valid = array();
         
         // Loop through each of the default_settings
         foreach( $defaults as $key => $setting ) { 
+            
+            // Check that the setting type in the config file for this option
+            // is in the available_field_types array.  If no, skip this one.
+            if( !in_array( $setting['type'], $this->available_field_types ) )
+                continue;
             
             if ( 'heading' != $setting['type']  )
                 $this->defaults[$key] = $setting['default'];            
@@ -405,16 +424,44 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
      */      
     protected function validate_defaults( $defaults ) {
 
-        $valid = array();
+        $pre_valid = array();
         
         // Loop through each of the default_settings
         foreach( $defaults as $key => $setting ) { 
-            
+                     
             if ( 'heading' != $setting['type']  )
-                $valid[$key] = $setting['default']; 
+                $pre_valid[$key] = $setting['default']; 
         }
+/**
+ * TO DO:  NEED TO VALID THE DEFAULT SETTINGS BEFORE STORING THEM.
+ * BUT HOW TO DO THIS WHEN old_value is set to $default_settings??
+ * 
+ */        
+
+        //
+        $valid = $this->sanitizer( $valid, $this->settings_group );
         
         return $valid ;
+    }
+    
+    /**
+     * Setup the available field types
+     *
+     * The child theme and/or plugins can add their own field types via
+     * 'river_available_field_types'.
+     *
+     * @since 0.0.1
+     *
+     */    
+    protected function setup_available_field_types() {
+        $this->available_field_types = apply_filters(
+                'river_available_field_types',             
+                array( 
+                    'button', 'checkbox', 'colorpicker', 'datepicker', 'email', 'heading',
+                    'imgselect', 'multicheck', 'radio', 'select', 'text', 
+                    'textarea', 'timepicker', 'upload-image', 'url' 
+                )
+        );       
     }
     
     /**
@@ -459,6 +506,7 @@ abstract class River_Admin_Config_Validator extends River_Settings_Sanitizer {
                         'forum_url'         => '/support/forums/',
                         // Save button text
                         'button_save_text'  => __( 'Save All Changes', 'river' ),
+                        'button_reset_text' => __( 'Reset All Options', 'river' ),
                         'notices'           => array(
                             'saved_notice'  => __( 'Settings Saved', 'river'),
                             'reset_notice'  => __( 'Settings Reset to Default', 'river'),
