@@ -25,7 +25,8 @@ if ( !class_exists( 'River_Admin_Settings_Page' ) ) :
  * 
  * @link    http://codex.wordpress.org/Settings_API
  */
-class River_Admin_Settings_Page extends River_Admin_Config_Validator {
+abstract class River_Admin_Settings_Page extends River_Settings_Config {
+ 
     
     /** Constructor & Destructor **********************************************/
     
@@ -38,18 +39,13 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
      * 
      * @param array     $config Configuration for the new settings page                 
      */
-    public function __construct( $config ) {
+    public function create( $config ) {
         
         // Validate the incoming $config. If valid, continue; else return.
-        if( ! $this->config_is_valid($config) )
+        if( ! $this->load_config($config) )
             return;
         
         $this->hooks();
-        
-        // Options are not defined in the options database yet.
-        if ( ! get_option( $this->settings_group ) )
-            $this->init_settings();      
-
     }
     
     /** Setup Functions *******************************************************/   
@@ -76,14 +72,16 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
         add_action( 'admin_init',       array( &$this, 'register_setting' ) ); 
         add_action( 'admin_init',       array( $this, 'uploader_setup' ) );
         
-        add_action( 'wp_ajax_river_ajax_save',  array( &$this, 'ajax_save_callback' ) );
-    
+        add_action( "wp_ajax_river_{$this->settings_group}", array( &$this, 'ajax_save_callback' ) );                   
+               
     }
     
     /**
      * Page request handler
      * 
      * Handles resetting the settings in the options database
+     * 
+     * @since 0.0.1
      * 
      * @return
      */
@@ -260,6 +258,7 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
      * @since 0.0.0
      */
     private function after_page_add_hooks() {
+        
         // Load scripts and styles    
         add_action( "admin_print_scripts-{$this->page_hook}", 
                 array( &$this, 'load_scripts' ) );
@@ -267,7 +266,7 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
                 array( &$this, 'load_styles' ) ); 
 
         // Load the Help Tab
-        add_action( 'load-' . $this->page_hook,  array( $this, 'help_tab' ) ); 
+        add_action( "load-{$this->page_hook}",  array( $this, 'help_tab' ) ); 
         
     }
     
@@ -382,9 +381,10 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
                     // $args (array) Args passed to the $callback function
                     $args 
                     );
-
         }
-
+        
+        if ( ! get_option( $this->settings_group ) )
+            $this->init_settings(); 
     }    
 
     /**
@@ -413,204 +413,6 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
     } 
     
 
-    /**
-     * If defined in the $config file, build and render the Help Tab for
-     * this Settings Page.
-     * 
-     * @uses help_tab()
-     * @return
-     * 
-     * @link http://codex.wordpress.org/Function_Reference/add_help_tab
-     */
-    public function help_tab() {
-        
-        $screen = get_current_screen();
-        
-        /*
-         * Check if current screen is My Admin Page
-         * Don't add help tab if it's not
-         */
-        if ( $screen->id != $this->page_hook )
-            return;        
-        
-        if ( isset( $this->form['help_file'] ) && file_exists( $this->form['help_file'] ))           
-            require( $this->form['help_file'] );
-            
-    }    
-
-    /**
-     * 
-     * http://return-true.com/2010/01/using-ajax-in-your-wordpress-theme-admin/
-     */
-    public function page_head() {
-        
-     
-        ?>
-
-        <script type="text/javascript">
-            
-            jQuery(document).ready( function($) {
-             
-                var form = $( 'form#<?php echo $this->form['id']; ?>' );
-                var settingsGroup = '<?php echo $this->settings_group ?>';
-                var reset = false;
-                var data;
-                var resetPopup = $( '#river-popup-reset' )
-                
-                <?php if( isset( $_REQUEST['reset'] ) ) { ?>
-                    reset = true;                   
-                <?php } ?>
-                    
-                if ( reset ) {
-
-                    var popup = $( '#river-popup-reset' );   
-
-                    resetPopup.fadeIn();
-
-                    window.setTimeout(function() {
-                        resetPopup.fadeOut();
-                        reset = false;                        
-                    }, 2000);                    
-                }
-                
-                //Update Message popup
-                $.fn.center = function () {
-                    this.animate({"top":( $(window).height() - this.height() - 200 ) / 2+$(window).scrollTop() + "px"},100);
-                    this.css( "left", 250 );
-                    return this;
-                }
-
-                $('#river-popup-save').center();
-                resetPopup.center();
-                $(window).scroll(function() {
-                    $('#river-popup-save').center();
-                    resetPopup.center();
-
-                });
-                
-                form.children('footer').find('input.reset-button').on("click", function() {                  
-                    url = '?page=<?php echo $this->page_id?>&reset=true';
-                    window.location =  url; 
-                });
-                
-                //Save everything else
-                form.submit( function() {
-                    
-                    var unchecked = '';                   
-                    var loc = window.location.search.split('&');
-                    
-                    //if url has '&reset=true', remove it
-                    if ( $.isArray(loc) && loc.length >= 2  ) {
-                        river.pushState( loc[0] );
-                    }
-                    
-                    // Get the unchecked checkboxes, i.e. to add to the data string
-                    form.find( 'input[type=checkbox]' ).not( ':checked' ).each( function() {
-                        unchecked += '&' + settingsGroup + '%5B' + $(this).attr('id') + '%5D=0';
-                    });
-                    		                    
-                    //data =  $(this).serialize();
-                    ajaxSave( 'save', 'settings_group=' + settingsGroup + '&' + 
-                        $(this).serialize() + unchecked );
-
-		    return false;
-                });
-                
-                ajaxSave = function( action, inputData ) {
-
-                    $( '.ajax-loading-img').fadeIn();                  
-                    <?php // Nonce Security
-                    if ( function_exists( 'wp_create_nonce' ) ) 
-                        $river_nonce = wp_create_nonce( $this->settings_group . '-options-update' );
-                    ?>                    
-                    data = {
-                        /**
-                         * We are straying from the standard 'GET' or 'POST'
-                         * settings here for 'type' to redefine it for passing
-                         * this page's settings_group.
-                         */
-                        type: '<?php echo $this->settings_group ?>',
-                        data: inputData,
-                        action: 'river_ajax_save',
-                        _ajax_nonce: '<?php echo $river_nonce; ?>'
-                    }                    
-                    //$.post( 'options.php', data, function(response) {
-                    $.post( ajaxurl, data, function(response) {
-                        var loading = $( '.ajax-loading-img' );
-                        var popup;
-                        if( 'save' == action && response) {
-                            popup = $( '#river-popup-save' );
-                              
-                        } else if ( ! response ) {
-                            popup = $( '#river-popup-error' );
-                        }
-                        popup.fadeIn();
-
-                        loading.fadeOut();
-
-                        window.setTimeout(function() {
-                           popup.fadeOut();
-                        }, 2000);
-                    });
-                       
-                }                
-
-            });
-        </script>  
-
-        <?php         
-        
-    } 
-    
-    /**
-     * AJAX Save Callback to save all the form's settings|options.
-     * 
-     * Note:    This callback is not linked to the class object.  Therefore, we
-     *          cannot call $this->settings_group.  To compensate, $this->settings_group
-     *          is stored $_POST['type'].
-     */
-    function ajax_save_callback() {
-        
-        $response = FALSE;              
-         
-        if( isset( $_POST['type'] ) ) {
-            
-            $settings_group = $_POST['type'];
-        
-            // check security with nonce.
-            if ( function_exists( 'check_ajax_referer' ) )
-                check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
-
-            $data = maybe_unserialize( $_POST['data'] );
-
-            // Check if the data is an array
-            if ( is_array( $data ) ) {
-                $passed_data = $data;
-            // No, so parse it out.
-            } else {
-                parse_str( $data, $passed_data );
-            }
-            
-            // One more security check
-            if ( $settings_group == $passed_data['settings_group'] ) {
-                
-                $options = get_option( $settings_group );
-
-                $newvalue = wp_parse_args(
-                            $passed_data[$settings_group], 
-                            $options );  
-                
-                // Time to update the option database and report the response
-                if( is_array( $newvalue ) & ! empty( $newvalue ) )
-                    $response = update_option( $settings_group, $newvalue ) ? TRUE : FALSE;
-            }
-
-        }
-        
-        // Pass the response back to AJAX
-        die( $response );
-    }
-
     /** Callbacks *************************************************************/    
     
     /**
@@ -629,14 +431,10 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
      * Display a subheader on each section, such as a description or more
      * information
      * 
-     * @since   0.0.0
+     * @since   0.0.3
      * 
      */
-    public function display_section_callback() {
-        
-        
-        
-    }
+    abstract public function display_section_callback();
 
     /**
      * Display the setting option on its section and page
@@ -649,8 +447,95 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
         river_admin_display_settings( $this->settings_group, $setting );
     }
 
+    /**
+     * AJAX Save Callback to save all the form's settings|options.
+     * 
+     * Note:    This callback is not linked to the class object.  Therefore, we
+     *          cannot call $this->settings_group.  To compensate, $this->settings_group
+     *          is stored $_POST['type'].
+     * 
+     * @since 0.0.3
+     */
+    function ajax_save_callback() {
+        
+        $response = '';              
+         
+        if( isset( $_POST['type'] ) ) {
+            
+            $settings_group = $_POST['type'];
+            
+            // check security with nonce.
+            if ( function_exists( 'check_ajax_referer' ) )
+                check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
+
+            $data = maybe_unserialize( $_POST['data'] );
+
+            // Check if the data is an array
+            if ( is_array( $data ) ) {
+                $passed_data = $data;
+            // No, so parse it out.
+            } else {
+                parse_str( $data, $passed_data );
+            }
+
+            // One more security check
+            if ( $settings_group == $passed_data['settings_group'] ) {
+                
+                $new_value = $passed_data[$settings_group];
+
+                if( !isset( $new_value ) || ! is_array( $new_value ) || empty( $new_value ) ) {
+                    die( $response );
+                    return;
+                } 
+                
+                // Get the current options db values
+                $options = get_option( $settings_group );                
+
+                // Compare $new_value keys against the defaults.  If there are
+                // differences, something is wrong. Just return & report the error.
+                $key_diff = array_diff_key( $new_value, $options );
+                if ( $key_diff ) {
+                    die( $response );
+                    return;
+                }
+                
+                // If the new values are identical to the current options db
+                // no need to save.
+                if ( $new_value === $options ) {
+                    $response = 'save';
+                } else {  
+                    $response = update_option( $settings_group, $new_value ) ? 'save' : 'error';
+                    
+                    /**
+                     * Check if the new_value is identical to what is
+                     * currently in the options db (this is set in class-settings-sanitizer).
+                     * If yes, then update_option will return FALSE, because
+                     * it did not update.  FALSE in this case is NOT an error.
+                     * Therefore, change $response to TRUE.
+                     */                    
+                    if( isset( $GLOBALS['river-is-seetings-identical-to-db'] ) &&
+                           $GLOBALS['river-is-seetings-identical-to-db'] && 
+                            'error' == $response )
+                        $response = 'nosave';
+                    
+                }
+            }
+        }
+        
+        // Pass the response back to AJAX
+        die( $response );
+    }    
   
     /** Helper Functions ******************************************************/
+    
+    /**
+     * Build and render the Help Tab for this Settings Page.
+     * 
+     * This method must be defined in the extended class(es)
+     * 
+     * @since 0.0.3
+     */ 
+    abstract public function help_tab();    
     
     /**
      * Media Uploader setup
@@ -682,7 +567,7 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
      * @link http://codex.wordpress.org/Function_Reference/wp_get_referer
      * @link http://codex.wordpress.org/Plugin_API/Filter_Reference/gettext
      */
-    function replace_thickbox_text( $translated_text, $original_text, $domain ) {
+    public function replace_thickbox_text( $translated_text, $original_text, $domain ) {
         
         if ( 'Insert into Post' == $original_text ) {
 
@@ -693,7 +578,6 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
         return $translated_text;
     
     }    
-
     
     /**
      * Enqueue the Style files
@@ -704,9 +588,6 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
      */
     public function load_styles() {
         
-        add_action( 'admin_head', array( &$this, 'page_head' ), 10 );
-        
-
         wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/admin-river.css' );  
         wp_enqueue_style( 'river_admin_css' );
         
@@ -718,7 +599,7 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
     /**
      * Enqueue the script files
      * 
-     * @since   0.0.0
+     * @since   0.0.3
      * 
      * @uses    RIVER_ADMIN_URL
      * @uses    RIVER_VERSION
@@ -735,7 +616,8 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
                 '', 
                 true); 
         // @link http://jscolor.com/
-        wp_register_script( 'jscolor', RIVER_ADMIN_URL . '/assets/js/jscolor.js', '', '', true);           
+        wp_register_script( 'jscolor', RIVER_ADMIN_URL . '/assets/js/jscolor.js', '', '', true); 
+        wp_register_script( 'river-admin-ajax', RIVER_ADMIN_URL . '/assets/js/river-admin-ajax.js' );
 
         wp_enqueue_script('jquery');
         wp_enqueue_script( 'thickbox' );
@@ -743,6 +625,21 @@ class River_Admin_Settings_Page extends River_Admin_Config_Validator {
         
         wp_enqueue_script( 'river-admin' );
         wp_enqueue_script( 'jscolor' );
+        wp_enqueue_script( 'river-admin-ajax' );
+        
+        if ( function_exists( 'wp_create_nonce' ) ) 
+            $river_nonce = wp_create_nonce( $this->settings_group . '-options-update' );        
+
+        // Variables to pass to the riverAdminAjax script
+        $pass_to_script = array(
+            'ajaxurl'           => admin_url( 'admin-ajax.php' ),
+            'resetRequest'      => isset($_REQUEST['reset']) ? $_REQUEST['reset'] : '',
+            'formID'            => $this->form['id'],
+            'settingsGroup'     => $this->settings_group,
+            'pageID'            => $this->page['id'],
+            'riverNonce'        => $river_nonce
+        );
+        wp_localize_script( 'river-admin-ajax', 'riverAdminAjax', $pass_to_script );
         
     }
     

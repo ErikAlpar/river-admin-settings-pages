@@ -48,6 +48,25 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      */
     protected $validator_filters;
     
+    /**
+     * Indicates if sanitizer is functioning on the default settings
+     * 
+     * @since 0.0.0
+     * 
+     * @var bool
+     */
+    protected $is_defaults_sanitizer = FALSE;
+    
+    /**
+     * Indicates if the new sanitized and validated settings are identical
+     * to the current options database
+     * 
+     * @since 0.0.2
+     * 
+     * @var bool
+     */
+    protected $is_settings_identical_to_db = FALSE;
+    
     /** Class Methods *********************************************************/
     
     /**
@@ -71,7 +90,8 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                     'zero_one'          => array( 'checkbox', 'button' ), 
                     'no_html'           => array(
                         'heading', 'text', 'upload', 'textarea', 'select', 'radio', 
-                        'multicheck', 'upload-image',
+                        'multicheck', 'upload-image', 'email', 'url', 'imgselect',
+                        'colorpicker'
                     ),
                     'safe_html'         => array(), 
                     'unfiltered_html'   => array(),
@@ -91,7 +111,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                     'numeric'           => array(),
                     'string'            => array( 'text', 'textarea' ),
                     'string_choices'    => array( 'imgselect', 'multicheck', 'radio', 'select' ),
-                    'url'               => array( 'upload-image', 'siteurl' ),
+                    'url'               => array( 'upload-image', 'url' ),
                     'zero_one'          => array( 'checkbox', 'button' ),
                 )
         );        
@@ -112,23 +132,26 @@ abstract class River_Settings_Sanitizer extends River_Admin {
          * add to the filter "sanitize_option_{$option_name}.  Here we are
          * adding a filter and the sanitizer is in this class
          */
-        add_filter( 'sanitize_option_' . $this->settings_group, array( $this, 'sanitizer' ), 10, 2 );
+        add_filter( 'sanitize_option_' . $this->settings_group, 
+                array( $this, 'do_validate_sanitize' ), 10, 2 );
 
         return true;
 
     }
     
     /**
-     * Sanitize a value, via the sanitization filter type associated with an
+     * Validate and sanitize a value, via the filter types associated with an
      * option.
      *
-     * @since 0.0.1
+     * @since 0.0.2
      *
-     * @param mixed $new_value New value
-     * @param string $option Name of the option
-     * @return mixed Filtered, or unfiltered value
+     * @param mixed     $new_value New value
+     * @param string    $option Name of the option
+     * @return mixed    Filtered, or unfiltered value
      */
-    public function sanitizer( $new_value, $option ) {
+    public function do_validate_sanitize( $new_value, $option ) {
+        
+        $this->is_settings_identical_to_db = false;
 
         // Oops this $option does not belong to this object
         if ( $option != $this->settings_group )
@@ -150,6 +173,10 @@ abstract class River_Settings_Sanitizer extends River_Admin {
             
             foreach ( $this->default_settings as $key => $setting ) {
                 
+                // We don't store a heading type in the options database
+                if ( 'heading' == $setting['type'] )
+                    continue;
+                
                 $old_value[$key] = isset( $old_value[$key] ) ? $old_value[$key] : '';
                 $new_value[$key] = isset( $new_value[$key] ) ? $new_value[$key] : '';
                 
@@ -161,18 +188,22 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                         $temp_new_value = array();
 
                         foreach( $new_value[$key] as $sub_key => $sub_value) {
+                            
+                            if( $new_value[$key] !== $old_value[$key] ) {
 
-                            $temp_new_value[$sub_key] = $this->do_validator_filter( 
-                                    $setting['validator_filter'], 
-                                    $sub_value, $old_value[$key], $sub_key, $key );
+                                $temp_new_value[$sub_key] = $this->do_validator_filter( 
+                                        $setting['validator_filter'], 
+                                        $sub_value, $old_value[$key], $sub_key, $key );
 
-                            if( $temp_new_value == $old_value[$key] )
-                                break;
+                                if ( $temp_new_value === $old_value[$key] )
+                                    break;                                
+                            }
 
                             // Pass through the sanitizer filter and store updated value
                             $temp_new_value[$sub_key] = $this->do_sanitizer_filter( 
                                     $setting['sanitizer_filter'], 
-                                    $sub_value, $old_value[$key] ); 
+                                    $sub_value, $old_value[$key] );
+
 
                             if( $temp_new_value == $old_value[$key] )
                                 break;
@@ -185,26 +216,32 @@ abstract class River_Settings_Sanitizer extends River_Admin {
                 } else {
                     
                     // if the new value = old value, then no need to validate
-                    if( ( $new_value[$key] != $old_value[$key] ) || 
-                            ( gettype( $new_value[$key] ) != gettype( $old_value[$key] ) ) )
+                    if( ( $new_value[$key] !== $old_value[$key] ) ) {
                         // Pass through the validator filter first and store updated value
                         $new_value[$key] = $this->do_validator_filter( 
                                 $setting['validator_filter'], 
                                 $new_value[$key], $old_value[$key], $new_value[$key], $key );
+                    }
                     
                     // Pass through the sanitizer filter and store updated value
                     $new_value[$key] = $this->do_sanitizer_filter( 
                             $setting['sanitizer_filter'], 
                             $new_value[$key], $old_value[$key] );
+
                 }
             }
+            
+            // Tell the caller that the new_value is identical to the old_value
+            $this->is_settings_identical_to_db = $new_value === $old_value ? TRUE : FALSE;
+            $GLOBALS['river-is-seetings-identical-to-db'] = $this->is_settings_identical_to_db;
+            
             return $new_value;
         }
         
         // We should never hit this, but just to be safe....
         return $new_value;
 
-    }    
+    }
 
     /** Sanitizer Filter ******************************************************/  
     
@@ -485,7 +522,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * @param string    $new_value New value to validate
      * @param string    $old_value Current value in options database
      * @return string   If new value returns a timestamp, returns the new
-     *                  value; else returns the old value 
+     *                  value; else returns the old value
      * @link http://codex.wordpress.org/Function_Reference/is_email
      */     
     function v_email( $new_value, $old_value ) {
@@ -506,14 +543,12 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * 
      * @param string    $new_value New value to validate
      * @param string    $old_value Current value in options database
-     * @param bool      $return_empty (opt) TRUE: returns the new vale if
-     *                  it's empty; FALSE: old value is returned
      * @return string   If new value is in hex, returns the new
      *                  value; else returns the old value 
      */     
-    function v_hex( $new_value, $old_value, $return_empty = TRUE ) {
+    function v_hex( $new_value, $old_value) {
 
-        if ( $return_empty && empty ($new_value) )
+        if ( empty ($new_value) )
             return $new_value;
         
         return ctype_xdigit( $new_value ) ? $new_value : $old_value;
@@ -581,7 +616,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * Choices validation - validating the new value is in the default settings'
      * choices for this option.
      * 
-     * @since 0.0.1
+     * @since 0.0.3
      * 
      * @param string    $new_value New value to validate
      * @param string    $old_value Current value in options database
@@ -597,6 +632,9 @@ abstract class River_Settings_Sanitizer extends River_Admin {
         if( ! is_string( $new_value) )
             return $old_value;
         
+        if ( empty ( $new_value ) )
+            return $new_value;
+        
         return array_key_exists( $option_key, $this->default_settings[$id]['choices'] ) ? 
                 $new_value : $old_value;
         
@@ -608,26 +646,27 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * Because of the complexities of an URL, we are only testing the
      * 
      * 
-     * @since 0.0.0
+     * @since 0.0.2
      * 
      * @param string    $new_value New value to validate
      * @param string    $old_value Current value in options database
+     * @param bool      $return_empty TRUE: return new_value if it's an empty string
      * @return string   If new value is an integer, returns the new
      *                  value; else returns the old value 
      */     
-    function v_url( $new_value, $old_value, $return_empty = TRUE ) {
+    function v_url( $new_value, $old_value ) {
         
         if ( is_string( $new_value ) ) {
             $new_value = trim( $new_value );
             
-            if ( $return_empty && empty( $new_value) )
+            if ( empty( $new_value) )
                 return $new_value;
             
         } else {
             return $old_value;
         }
         
-        return (bool) preg_match( '#http(s?)://(.+)#i', $new_value ) ? $new_value : $old_value;
+        return preg_match( '#http(s?)://(.+)#i', $new_value ) ? $new_value : $old_value;
     } 
     
     /**

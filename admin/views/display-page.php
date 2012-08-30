@@ -29,6 +29,11 @@ if ( isset( $this->form['site_url'] ) ) {
             <?php esc_html( _e( 'Options Updated', 'river' ) ); ?>
         </div>
     </div>
+    <div id="river-popup-nosave" class="river-save-popup">
+        <div class="river-save-nosave">
+            <?php esc_html( _e( 'Options Were Not Saved', 'river' ) ); ?>
+        </div>
+    </div>    
     <div id="river-popup-reset" class="river-save-popup">
         <div class="river-save-reset">
             <?php esc_html( _e( 'Options Reset', 'river' ) ); ?>

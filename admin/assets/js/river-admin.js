@@ -1,23 +1,22 @@
 /**
- * River Admin Interface JavaScript
+ * riverAdmin JavaScript|jQuery functions
+ * 
+ * Load into riverAdmin namespace
  *
- * All JavaScript logic for the theme options admin interface.
- * @since 4.8.0
- *
+ * @category    River 
+ * @package     Framework Admin
+ * @subpackage  River Admin JS
+ * @since       0.0.3
+ * @author      CodeRiver Labs 
+ * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
+ * @link        http://coderiverlabs.com/
+ * 
  */
 (function($){
-
-    /**
-     * Cache global variabes
-     */
-    var container = $('div#river-container');
-    var mainSection = container.find('section#main');
-    var content = mainSection.find('.content');
-    var nav = mainSection.find('nav#river-sections');
-    var navA = nav.find('a');
-    var sections = [];
-
-    window['river'] = {
+    
+    riverAdmin = {
+        
+        name: 'riverAdmin',
 
 	/**
 	 * Tasks on page load
@@ -43,26 +42,26 @@
         navSectionHandler: function() {
 
             // Populate the sections[]
-            nav.find('ul li').each(function(){
+            riverAdmin.nav.find('ul li').each(function(){
                 // Get the menu title and slug
                 var title = $(this).children('a').text();
                 var slug = $(this).attr('id');
 
                 // If not already defined, add the title into the array
-                if( "undefined" == typeof sections[title] ) {
-                    //sections.push(title);
-                    sections[title] = [];
+                if( "undefined" == typeof riverAdmin.sections[title] ) {
+                    //riverAdmin.sections.push(title);
+                    riverAdmin.sections[title] = [];
                 }
 
                 // If not already defined, add the menu_slug into the array
-                if( "undefined" == typeof sections[title][slug] ) {
-                    sections[title].push(slug);
+                if( "undefined" == typeof riverAdmin.sections[title][slug] ) {
+                    riverAdmin.sections[title].push(slug);
                 } 
 
             });
 
             // Add div wrap around each section
-            var section = content.find('h3').wrap("<div class=\"section\">");
+            var section = riverAdmin.content.find('h3').wrap("<div class=\"section\">");
 
             section.each( function () {
                $(this).parent().append($(this).parent().nextUntil("div.section")); 
@@ -70,7 +69,7 @@
 
            // Add 'id' to the section div wrap 	
            $("div.section").each(function(index) {
-                $(this).attr("id", sections[$(this).children("h3").text()]);
+                $(this).attr("id", riverAdmin.sections[$(this).children("h3").text()]);
                 if (index == 0)
                     $(this).addClass("current");
                 else
@@ -78,10 +77,9 @@
             });    
 
             // listen for the click event & then scroll to the section
-            navA.on( 'click', function() {
+            riverAdmin.navA.on( 'click', function() {
                 // This this section to current
-                $.when(river.setCurrent( this, this.hash.substring(1) )).then(river.removeURLHash() );
-// TO DO:  THIS IS JERKY RIGHT NOW
+                $.when(riverAdmin.setCurrent( this, this.hash.substring(1) )).then( riverAdmin.removeURLHash() );
                 $("html, body").animate({ scrollTop: 0 }, "slow");
 
             }); 
@@ -105,11 +103,11 @@
 
             if (hash) {
 
-                nav
+                riverAdmin.nav
                     .find('.current').removeClass('current').end()
                     .find('a[href=#' + hash + ']').parent().addClass('current');
 
-                content
+                riverAdmin.content
                     .find('.current')
                         .removeClass('current')
                         .addClass('hide')
@@ -172,7 +170,7 @@
             $('.upload-button').on( 'click', function() {
 
                 // grab the title tag, which we'll use in the header of the thickbox
-                var title = $(this).attr( 'title' );        
+                var title = $(this).attr( 'title' );
                 // grab the targetfield to post the url back to
                 targetfield = $(this).prev('.upload-url');
 
@@ -223,43 +221,18 @@
         },
         
         removeURLHash: function () { 
-            var loc = window.location;
-console.log(loc);            
-            
-            // Need to check if supports HTML5
-            // http://stackoverflow.com/questions/1397329/how-to-remove-the-hash-from-window-location-with-javascript-without-page-refresh
-            if( true ) {
-                
-                history.pushState("", document.title, loc.pathname + loc.search);
-                
-            } else {
-                
-                var scrollV, scrollH ;
-                
-                if ("pushState" in history) {
-                    history.pushState("", document.title, loc.pathname + loc.search);
-                } else {
-                    // Prevent scrolling by storing the page's current scroll offset
-                    scrollV = document.body.scrollTop;
-                    scrollH = document.body.scrollLeft;
 
-                    loc.hash = "";
+            riverAdmin.pushState( window.location.search );
 
-                    // Restore the scroll offset, should be flicker free
-                    document.body.scrollTop = scrollV;
-                    document.body.scrollLeft = scrollH;
-                }                
-            }
-console.log('removeURLHash after ' + loc);
         },
         
         pushState: function( finalLocSearch ) {
             
             var loc = window.location;
-            
+
+// TO DO:  Add modernizer here to check for HTML5 support
             // Need to check if supports HTML5
-            // http://stackoverflow.com/questions/1397329/how-to-remove-the-hash-from-window-location-with-javascript-without-page-refresh
-            if( '' ) {
+            if( true ) {
                 
                 history.pushState("", document.title, loc.pathname + finalLocSearch );
                 
@@ -293,10 +266,20 @@ console.log('removeURLHash after ' + loc);
 	 */
         ready: function() {
             
-            river.pageLoad();
-            river.navSectionHandler();
-            river.imgselectHandler(); 
-            river.uploadImageHandler();
+            /**
+             * Cache global variabes
+             */
+            riverAdmin.container = $('div#river-container');
+            riverAdmin.mainSection = riverAdmin.container.find('section#main');
+            riverAdmin.content = riverAdmin.mainSection.find('.content');
+            riverAdmin.nav = riverAdmin.mainSection.find('nav#river-sections');
+            riverAdmin.navA = riverAdmin.nav.find('a');
+            riverAdmin.sections = [];            
+            
+            riverAdmin.pageLoad();
+            riverAdmin.navSectionHandler();
+            riverAdmin.imgselectHandler(); 
+            riverAdmin.uploadImageHandler();
         }
 
     };
@@ -311,7 +294,7 @@ console.log('removeURLHash after ' + loc);
      * @river
      */
     $(document).ready(function () {
-        river.ready();
+        riverAdmin.ready();
     });
     
 })(jQuery);
@@ -319,12 +302,12 @@ console.log('removeURLHash after ' + loc);
 /**
  * Helper function for confirming a user action.
  *
- * This function is deprecated in favor of river.confirm(text) which provides
+ * This function is deprecated in favor of riverAdmin.confirm(text) which provides
  * the same functionality.
  *
- * @since 1.0.0
+ * @since 0.0.0
  */
 function river_confirm(text) {
-        return river.confirm(text);
+        return riverAdmin.confirm(text);
 } 
 

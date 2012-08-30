@@ -4,9 +4,9 @@
 
 * CodeRiver Labs
 * Whit Skyler ( [@whit_skyler](http://twitter.com/whit_skyler ) / [whitskyler.me](http://whitskyler.me/) )
-* Franklin Hubertus ( [@frankhubertus](http://twitter.com/frankhuberts ) / [coderiverlabs.com](http://coderiverlabs.com/) )
+* Franklin Hubertus ( [@frankhubertus](http://twitter.com/frankhubertus ) / [coderiverlabs.com](http://coderiverlabs.com/) )
 
-**Version**: 0.0.0   
+**Version**: 0.0.3  
 **Requires at least**: 3.3  
 **Tested up to**: 3.3  
 **License**: GPLv2  

@@ -28,6 +28,7 @@ function river_define_constants() {
     define( 'CHILD_DIR', get_stylesheet_directory() );
     define( 'CHILD_URL', get_stylesheet_directory_uri() );
 
+    
     // Lib
     define( 'RIVER_LIB_DIR', RIVER_DIR . '/lib' );    
     define( 'RIVER_LIB_URL', RIVER_URL . '/lib' );
@@ -35,11 +36,13 @@ function river_define_constants() {
     // Framework
     define( 'RIVER_ADMIN_DIR', RIVER_LIB_DIR . '/framework/admin' );    
     define( 'RIVER_ADMIN_URL', RIVER_LIB_URL . '/framework/admin' );
+
     
     /** Define Database Constants *********************************************/
     define( 'RIVER_SETTINGS', 'river_settings' );
-    define( 'RIVER_SEO_SETTINGS', 'river_seo_settings' );    
-   
+    define( 'RIVER_SEO_SETTINGS', 'river_seo_settings' );
+    define( 'RIVER_SANITIZER_ERROR', 'RIVER SANITIZER ERROR');
+    define( 'RIVER_FIELD_TYPE_ERROR', 'RIVER FIELD TYPE ERROR');
     
 }
 add_action( 'river_init', 'river_define_constants' );
@@ -50,17 +53,24 @@ add_action( 'river_init', 'river_define_constants' );
  * @since 0.0.0
  */
 function river_load_includes() {
-
+    
+    // Run the river_pre_framework hook, which is called from the Child theme
+    do_action( 'river_pre_framework' );
+    
+    /** Core ******************************************************************/     
+    require_once( RIVER_CORE_DIR . '/core-helpers.php' );    
+    
     /** Admin *****************************************************************/
     if ( is_admin() ) {
         require_once( RIVER_ADMIN_DIR . '/class-admin.php' );
-        require_once( RIVER_ADMIN_DIR . '/class-settings-sanitizer.php' );         
-        require_once( RIVER_ADMIN_DIR . '/class-admin-config-validator.php' );       
+        require_once( RIVER_ADMIN_DIR . '/class-settings-sanitizer.php' ); 
+        require_once( RIVER_ADMIN_DIR . '/class-settings-config.php' );       
         require_once( RIVER_ADMIN_DIR . '/class-admin-settings-page.php' );
-        require_once( RIVER_ADMIN_DIR . '/admin-river.php' );
-        require_once( RIVER_ADMIN_DIR . '/admin-menu.php' );
         require_once( RIVER_ADMIN_DIR . '/views/display-settings.php');
-        require_once( RIVER_ADMIN_DIR . '/admin-helpers.php');        
+        require_once( RIVER_ADMIN_DIR . '/admin-helpers.php'); 
+        
+        require_once( RIVER_ADMIN_DIR . '/class-river-settings-page.php' );
+        require_once( RIVER_ADMIN_DIR . '/class-seo-settings-page.php' );
     }
   
     

@@ -101,8 +101,7 @@ abstract class River_Admin {
      * 
      * @var array 
      */
-    protected $defaults;
-   
+    protected $defaults;  
     
     /** Getters ***************************************************************/    
     

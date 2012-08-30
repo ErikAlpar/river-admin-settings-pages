@@ -88,7 +88,8 @@ function river_admin_display_settings( $settings_group, $setting ) {
 
             printf ( '<h4 class="heading">%s</h4>',
                     esc_html( $setting['desc'] ) );
-            break;    
+            break; 
+     
 
         // imgselect is for displaying an image over a radio input, e.g. page layout selector
         case 'imgselect':
@@ -144,7 +145,7 @@ function river_admin_display_settings( $settings_group, $setting ) {
                 echo '<li>';
 
                 printf( '<input id="%2$s%6$s" class="multicheck%1$s" type="checkbox" ' .
-                        'name="%3$s[%2$s][%4$s]" value="%4$s" %5$s data-default="%6$s"/>', 
+                        'name="%3$s[%2$s][%4$s]" value="%4$s" %5$s data-key="%2$s"/>', 
                         esc_attr( $setting['class'] ),
                         esc_attr( $id ),
                         esc_attr( $settings_group ),
@@ -234,7 +235,9 @@ function river_admin_display_settings( $settings_group, $setting ) {
 
             break; 
 
+        case 'email':
         case 'text':
+        case 'url':
 
             printf( '<input id="%1$s" class="regular-text%2$s" type="text" ' .
                     'name="%3$s[%1$s]" value="%4$s" placeholder="%5$s" data-default="%6$s"/>',

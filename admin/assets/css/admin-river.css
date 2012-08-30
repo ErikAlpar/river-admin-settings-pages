@@ -30,17 +30,22 @@ audio:not([controls]) { display: none; }
 #river-container #header { 
     height: 80px; 
     background-color: #d7e6f2; 
-    border: 1px solid #a4bbcd; 
     border-top-left-radius: 15px; 
     -moz-border-radius-topleft: 15px; 
     -webkit-border-top-left-radius: 15px; 
     -webkit-border-top-right-radius: 15px; 
     border-top-right-radius: 15px; 
     -moz-border-radius-topright: 15px;  
-    /*INSET SHADOW*/
+
     -webkit-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
     -moz-box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
     box-shadow: inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);
+/*    background: none repeat scroll 0 0 #d7e6f2;
+    border-radius: 5px 5px 0 0;
+    color: #FFFFFF;
+    font: 25px/48px Arial,Helvetica,sans-serif;
+    margin: -21px -21px 0;
+    padding: 16px 20px 4px;*/
 }
 
 header#header .logo  { float: left; margin: 24px 0 0 25px; height: 35px; }
@@ -415,6 +420,7 @@ section#main .content div#image-preview a {
 #river-container .river-save-popup { position:absolute; -moz-border-radius:12px; background:rgba(0,0,0,0.4); color:#fff; font-size:24px; text-align:center; display:none; z-index: 10; }
 
 #river-container .river-save-save { background:url( ../images/happy.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
+#river-container .river-save-nosave { background:url( ../images/warning.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
 #river-container .river-save-reset { background:url( ../images/warning.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
 #river-container .river-save-error { background:url( ../images/warning.png) 20px 50% no-repeat; padding:30px 30px 30px 70px}
 
