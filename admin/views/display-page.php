@@ -60,7 +60,6 @@ if ( isset( $this->form['site_url'] ) ) {
         ?>
 
         <header id="header">
-            <div class="logo"></div>
             <div class="info">
                 <span class="page-title">
                     <?php echo esc_html( get_admin_page_title() ); ?>
@@ -70,34 +69,38 @@ if ( isset( $this->form['site_url'] ) ) {
                             esc_html( $this->form['version'] ) ); ?>
                 </span>
             </div>
-            <div class="clearfix"></div>
-            <nav id="support">
-                <ul>
-                    <li class="right">
-                        <?php 
 
-                        printf( '<input id="reset" class="button reset-button" type="button" value="%1$s" onclick="%2$s">', 
-                                $this->form['button_reset_text'],
-                                'return river_confirm(\'' . 
-                                    esc_js( __( 'Are you sure you want to reset? ' ) )
-                                    . '\n' .
-                                    esc_js( __( 'All settings for this page will be lost & reset back to the default settings.', 'river' ) ) 
-                                    . '\');'                     
-                                ); 
-                        ?>
-                    </li>
-                    <li class="right">
-                        <?php 
+            <div id="save-reset" class="clearfix">
 
-                        printf( '<img style="display:none" src="%s" class="ajax-loading-img ajax-loading-img-bottom" alt="Working..." />', 
-                                RIVER_ADMIN_URL . '/assets/images/loading-top.gif' );                        
-                        printf( '<input class="button submit-button" type="submit" value="%s">',
-                                esc_html( __( 'Save All Changes', 'river' ) ) );
-                        ?>
+                <?php 
 
-                    </li>
-                </ul>                    
-            </nav>
+                printf( '<img style="display:none" src="%s" class="ajax-loading-img ajax-loading-img-bottom" alt="Working..." />', 
+                        RIVER_ADMIN_URL . '/assets/images/loading-bottom.gif' );
+                // @link http://codex.wordpress.org/Function_Reference/submit_button            
+                submit_button( 
+                        // $text The text of the button (default 'Save Changes')
+                        $this->form['button_save_text'],
+                        // $type Type of button: primary, secondary, delete
+                        'primary', 
+                        // $name HTML name of the submit button
+                        'submit',
+                        // $wrap True to wrap in <p> tag
+                        false
+                        // $other_attributes (opt) array|string
+                        );
+
+
+                printf( '<input id="reset" class="button reset-button" type="button" value="%1$s" onclick="%2$s">', 
+                        $this->form['button_reset_text'],
+                        'return river_confirm(\'' . 
+                            esc_js( __( 'Are you sure you want to reset? ' ) )
+                            . '\n' .
+                            esc_js( __( 'All settings for this page will be lost & reset back to the default settings.', 'river' ) ) 
+                            . '\');'                     
+                        ); 
+                ?>
+
+            </div>
         </header>
         <div class="clearfix"></div>
         <section id="main">
@@ -105,7 +108,6 @@ if ( isset( $this->form['site_url'] ) ) {
             <?php if( $this->sections ) : ?>
 
                 <nav id="river-sections">
-                    <div class="shadow"></div>
                     <ul>
                         <?php 
                         $first = true;
@@ -115,7 +117,6 @@ if ( isset( $this->form['site_url'] ) ) {
                             // href tag because this is a hash (in page)
                             // link.
                             printf( '<li id="%1$s" class="%1$s %2$s">' .
-                                    '<div class="river-menu-arrow"><div></div></div>' .
                                     '<a href="#%1$s"' .
                                     'title="%3$s">%4$s</a></li>',
                                     esc_attr( $slug ),

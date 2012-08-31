@@ -812,13 +812,13 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Enqueue the Style files
      * 
-     * @since   0.0.0
+     * @since   0.0.5
      * 
      * @link    http://codex.wordpress.org/Function_Reference/wp_enqueue_style
      */
     public function load_styles() {
         
-        wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/admin-river.css' );  
+        wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/river-admin.css' );  
         wp_enqueue_style( 'river_admin_css' );
         
         // Media Uploader Stylesheet

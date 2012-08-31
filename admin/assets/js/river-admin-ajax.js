@@ -61,7 +61,7 @@
 	/**
 	 * Handles "reset all options" tasks
 	 *
-	 * @since 0.0.3
+	 * @since 0.0.5
 	 *
 	 * @function
 	 */         
@@ -82,7 +82,7 @@
             } 
             
             // Reset clicked function
-            riverSettings.form.children('footer').find('input.reset-button').on("click", function() {                 
+            riverSettings.form.find('#save-reset').find('input.reset-button').on("click", function() {                 
                 url = '?page=' + riverSettings.pageID + '&reset=true';
                 window.location =  url; 
             });            

@@ -1,0 +1,50 @@
+/*
+    Admin Name: River
+    Description: Stylesheet for the River Settings Page
+    Author: CodeRiver Labs 
+    Author URI: http://coderiverlabs.com
+    Version: 0.0.0
+
+    License: GNU General Public License v2.0 (or later)
+    License URI: http://www.opensource.org/licenses/gpl-license.php
+*/
+/* CSS crunched with Crunch - http://crunchapp.net/ */
+
+#river-container{margin:30px 15px 2px 5px;width:95%;position:relative;z-index:0;}
+#river-container #header{height:80px;background:none repeat scroll 0 0 #d7e6f2;-webkit-border-radius:10px 10px 0 0;-moz-border-radius:10px 10px 0 0;-ms-border-radius:10px 10px 0 0;-o-border-radius:10px 10px 0 0;border-radius:10px 10px 0 0;color:#ffffff;padding:16px 20px 4px;}#river-container #header .info{float:left;margin:26px 25px 0 25px;}#river-container #header .info span{display:block;line-height:15px;text-transform:uppercase;color:#4e4e4e;text-shadow:1px 1px 0 #fff;}
+#river-container #header .info .page-title{font-size:15px;font-weight:bold;}
+#river-container #header .info .page-version{font-size:12px;}
+#river-container #header .info b{font-size:11px;text-transform:none;color:#444;font-weight:100;}
+#river-container #header #save-reset{float:right;margin:26px 25px 0 25px;}#river-container #header #save-reset #reset{float:left;margin-right:10px;}
+#river-container #header #save-reset #submit{float:right;}
+section#main{background-color:#f1f1f1;border-bottom:1px solid #d8d8d8;border-left:1px solid #d8d8d8;border-right:1px solid #d8d8d8;position:relative;overflow:hidden;}
+nav#river-sections{float:left;z-index:9999;width:145px;}nav#river-sections ul{list-style:none outside none;padding:0;}nav#river-sections ul li{margin-bottom:0;}nav#river-sections ul li a,nav#river-sections ul li a:link,nav#river-sections ul li a:visited{display:block;padding:7px 10px 7px 10px;font-size:12px;font-weight:bold;line-height:18px;text-decoration:none;color:#797979;border-bottom:1px solid #d8d8d8;border-top:1px solid #ffffff;text-shadow:0 1px 0 #ffffff;}
+nav#river-sections ul li.current,nav#river-sections ul li.current a:link,nav#river-sections ul li.current a:visited{color:#333333;background-color:#ffffff;border:1px 0 1px 0 solid #cccccc !important;}
+nav#river-sections ul li a:hover{color:#D54E21;background-color:#e4e4e4;}
+section#main .content{min-height:650px;padding:0 20px;font-family:sans-serif;background-color:#fff;overflow:auto;}section#main .content .section{margin-bottom:10px;border-bottom:1px solid #e7e7e7;padding-bottom:15px;}section#main .content .section h3{font-size:1.5em;margin:15px 0 5px;padding:7px 0px;}
+section#main .content th,section#main .content td{float:left;width:90%;}
+section#main .content th{font-size:14px;font-weight:bold;line-height:18px;margin:20px 0 0 0;}
+#river-container{}#river-container textarea,#river-container input,#river-container select{-webkit-border-radius:4px;-moz-border-radius:4px;-ms-border-radius:4px;-o-border-radius:4px;border-radius:4px;border:1px solid #dfdfdf;}
+#river-container textarea,#river-container input[type="text"],#river-container select{width:99%;}
+#river-container input[type=text],#river-container select{height:28px;}
+#river-container input[type="checkbox"],#river-container input[type="radio"]{margin-right:5px;vertical-align:baseline;}
+#river-container input:focus,#river-container select:focus,#river-container textarea:focus{background:#ffffff;}
+#river-container div.imgselect{float:left;margin:0 15px 0 0;width:345px;}#river-container div.imgselect input{display:none;}
+#river-container div.imgselect img{border:3px solid #dedede;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;border-radius:3px;cursor:pointer;display:none;margin:0 5px 10px 0;}
+#river-container div.imgselect .selected img{border:3px solid #000000;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;border-radius:3px;}
+#river-container div.imgselect label.imgselect{display:block;float:left;}
+#river-container .upload-url{max-width:70%;margin-right:10px;}
+#river-container div#image-preview{float:left;margin-left:1px;margin-top:3px;position:relative;width:344px;z-index:1;}#river-container div#image-preview img{background:none repeat scroll 0 0 #FAFAFA;border:1px solid #cccccc #eeeeee #eeeeee #cccccc;float:left;max-width:334px;padding:4px;}
+#river-container div#image-preview a{background:url("../images/ico-delete.png") no-repeat scroll 0 0 transparent;border:medium none;bottom:-4px;display:block;float:left;height:16px;left:-4px;padding:0;position:absolute;text-indent:-9999px;width:16px;}
+#river-container footer#save-reset{background:#f3f3f3;border:solid #ccc;border-width:0px 1px 1px 1px;padding:10px 20px 0px 20px;height:35px;text-align:right;-webkit-box-shadow:inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);-moz-box-shadow:inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);-ms-box-shadow:inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);-o-box-shadow:inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);box-shadow:inset 1px 1px 0 rgba(255,255,255,.2), inset -1px -1px 0 rgba(255,255,255,.2);}#river-container footer#save-reset #reset{float:left;}
+#river-container footer#save-reset #submit{float:right;}
+#river-container .river-save-popup{position:absolute;-webkit-border-radius:12px;-moz-border-radius:12px;-ms-border-radius:12px;-o-border-radius:12px;border-radius:12px;background:rgba(0, 0, 0, 0.4);color:#ffffff;font-size:24px;text-align:center;display:none;z-index:10;}
+#river-container .river-save-save,#river-container .river-save-nosave,#river-container .river-save-reset,#river-container .river-save-error{padding:30px 30px 30px 70px;}
+#river-container .river-save-save{background:url(../images/happy.png) 20px 50% no-repeat;}
+#river-container .river-save-nosave{background:url(../images/warning.png) 20px 50% no-repeat;}
+#river-container .river-save-reset{background:url(../images/warning.png) 20px 50% no-repeat;}
+#river-container .river-save-error{background:url(../images/warning.png) 20px 50% no-repeat;}
+.reset-button{color:#c77 !important;text-shadow:0 1px 0 #fff !important;}.reset-button:hover{border-color:#c77!important;}
+.clearfix{*zoom:1;}.clearfix:before,.clearfix:after{content:"";display:table;}
+.clearfix:after{clear:both;}
+.hide{display:none;}
