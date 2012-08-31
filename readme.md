@@ -6,7 +6,7 @@
 * Whit Skyler ( [@whit_skyler](http://twitter.com/whit_skyler ) / [whitskyler.me](http://whitskyler.me/) )
 * Franklin Hubertus ( [@frankhubertus](http://twitter.com/frankhubertus ) / [coderiverlabs.com](http://coderiverlabs.com/) )
 
-**Version**: 0.0.3  
+**Version**: 0.0.5  
 **Requires at least**: 3.3  
 **Tested up to**: 3.3  
 **License**: GPLv2  
@@ -24,11 +24,12 @@ River Admin Settings Pages allows theme developers and users to create three dif
 * AJAX Saving
 
 ##### Field Types:
-* colorpicker
+
 * checkbox
+* colorpicker
 * datepicker
 * heading
-* heading
+* imgselect
 * multicheck
 * radio
 * select 
@@ -57,7 +58,7 @@ This script is easy to install. If you can't figure it out you probably shouldn'
 * Complete code optimization
 * Complete benchmark testing
 * Complete unit testing
-* Convert CSS to LESS CSS
+* Write tutorial
 
 ## Changelog
 
