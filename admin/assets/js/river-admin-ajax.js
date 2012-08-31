@@ -175,7 +175,7 @@
                         }
                     }
                 }                    
-                //$.post( 'options.php', data, function(response) {
+                //riverSettings.ajaxURL
                 $.post( riverSettings.ajaxURL, data, function(response) {
                     var loading = $( '.ajax-loading-img' );
                     var popup;

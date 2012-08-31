@@ -7,7 +7,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Example Config
- * @since       0.0.2
+ * @since       0.0.4
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -36,21 +36,13 @@
             'id'                => '',
             // Displayed under the page title
             'version'           => '',
-            // Site URL
-            'site_url'          => '',
-            // Changelog URL
-            'changelog_url'     => '',
-            // Docs URL
-            'docs_url'          => '',
-            // Forum URL
-            'forum_url'         => '',
             // Save button text
             'button_save_text'  => __( 'Save All Changes', 'river' ),
             'button_reset_text' => __( 'Reset All Options', 'river' ),
             // File URL and filename to the help PHP file
             'help_file'         => '',
         ),
-        'page_config' => array(
+        'page' => array(
             // id for this settings page
             'id'                => '',
             // Define the menus and pages for the corresponding $config['type']
@@ -107,24 +99,53 @@
     * needed.
     */
    
-/** text **********************************************************************/   
-   
-   // Example 'text' for a HTML text field
-    $config['default_settings']['example_text'] = array(
+/** checkbox ******************************************************************/      
+    // Example 'checkbox' for a HTML checkbox field
+    $config['default_settings']['example_checkbox'] = array(
         // settings ID for settings array & HTML element
-        'id'                => 'example_text',
+        'id'                => 'example_checkbox',
         // element's label
-        'title'             => __( 'Example Text Input', 'river' ),
+        'title'             => __( 'Example Checkbox Input', 'river' ),
         // (opt) description displayed under the element
-        'desc'              => __( 'This is a description for the text input.', 'river' ),
-        // default value
-        'default'           => '',        
+        'desc'              => __( 'This is a description for the Checkbox input.', 'river' ),
+        // default value MUST be integer and 0 or 1
+        'default'           => 1,        
         // HTML field type
-        'type'              => 'text',        
+        'type'              => 'checkbox',        
         // section these are assigned to
         'section_id'        => 'section1',
         
         /** These are the Optional Arguments & do not have to be included *****/
+        
+        // (opt) add a custom class to the HTML element
+        'class'             => '',
+        // (opt) Specify the sanitization filter here; else it's set
+        // automatically in the Settings Sanitizer Class
+        'sanitizer_filter'  => 'zero_one',
+        // (opt) Specify the validation filter here; else it's set
+        // automatically in the Settings Sanitizer Class        
+        'validator_filter'  => 'zero_one',
+        // (opt) sets an inline style
+        'style'             => '',
+    ); 
+    
+/** colorpicker ***************************************************************/
+    // Example 'colorpicker' for a HTML colorpicker field
+    $config['default_settings']['example_colorpicker'] = array(
+        // settings ID for settings array & HTML element
+        'id'                => 'example_colorpicker',
+        // element's label
+        'title'             => __( 'Example Colorpicker Input', 'river' ),
+        // (opt) description displayed under the element
+        'desc'              => __( 'Click on the field to select the new color.', 'river' ),
+        // default value
+        'default'           => 'FFFFFF',        
+        // HTML field type
+        'type'              => 'colorpicker',        
+        // section these are assigned to
+        'section_id'        => 'section2',
+        
+        /** These are the Optional Arguments & do not have to be included *****/        
         
         // (opt) add a custom class to the HTML element
         'class'             => '',
@@ -135,7 +156,7 @@
         'sanitizer_filter'  => 'no_html',
         // (opt) Specify the validation filter here; else it's set
         // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'string',
+        'validator_filter'  => 'hex',
         // (opt) sets an inline style
         'style'             => '',
     );
@@ -172,85 +193,81 @@
         'style'             => '',
     ); 
     
-/** url ***********************************************************************/    
-    // Example 'url' for a HTML text field
-    $config['default_settings']['example_url'] = array(
+/** heading *******************************************************************/     
+   // Example 'heading' for a HTML <h4> tag
+    $config['default_settings']['example_heading'] = array(
         // settings ID for settings array & HTML element
-        'id'                => 'example_url',
-        // element's label
-        'title'             => __( 'Example URL Input', 'river' ),
-        // (opt) description displayed under the element
-        'desc'              => __( 'This is a description for the URL input.', 'river' ),
-        // default value
-        'default'           => '',        
+        'id'                => 'example_heading',
+        // This is the text between the <h4> tags
+        'desc'              => __( 'Example Heading', 'river' ),      
         // HTML field type
-        'type'              => 'url',        
+        'type'              => 'heading',        
         // section these are assigned to
         'section_id'        => 'section1',
-        
-        /** These are the Optional Arguments & do not have to be included *****/
-        
-        // (opt) add a custom class to the HTML element
-        'class'             => '',
-        // (opt) Sets a placeholder in the form's text field
-        'placeholder'       => __( 'http://domain.com', 'river'),
-        // (opt) Specify the sanitization filter here; else it's set
-        // automatically in the Settings Sanitizer Class
-        'sanitizer_filter'  => 'no_html',
-        // (opt) Specify the validation filter here; else it's set
-        // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'url',
-        // (opt) sets an inline style
-        'style'             => '',
-    );    
-     
-/** textarea ******************************************************************/    
-    // Example 'textarea' for a HTML textarea field
-    $config['default_settings']['example_textarea'] = array(
-        // settings ID for settings array & HTML element
-        'id'                => 'example_textarea',
-        // element's label
-        'title'             => __( 'Example Textarea Input', 'river' ),
-        // (opt) description displayed under the element
-        'desc'              => __( 'This is a description for the Textarea input.', 'river' ),
-        // default value
-        'default'           => '',        
-        // HTML field type
-        'type'              => 'textarea',        
-        // section these are assigned to
-        'section_id'        => 'section1',
-        
-        /** These are the Optional Arguments & do not have to be included *****/        
-        
-        // (opt) add a custom class to the HTML element
-        'class'             => '',
-        // (opt) Sets a placeholder in the form's text field
-        'placeholder'       => '',
-        // (opt) Specify the sanitization filter here; else it's set
-        // automatically in the Settings Sanitizer Class
-        'sanitizer_filter'  => 'no_html',
-        // (opt) Specify the validation filter here; else it's set
-        // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'string',
-        // (opt) sets an inline style
-        'style'             => '',
     );
-
-/** checkbox ******************************************************************/      
-    // Example 'checkbox' for a HTML checkbox field
-    $config['default_settings']['example_checkbox'] = array(
+    
+/** imgselect *****************************************************************/    
+    // Example 'imgselect', which is a HTML radio buttons but with an image
+    // shown instead of the radio button.  Ways to use may be for page layout
+    // selection, footer layout, etc.
+    $config['default_settings']['example_imgselect'] = array(
         // settings ID for settings array & HTML element
-        'id'                => 'example_checkbox',
+        'id'                => 'example_imgselect',
         // element's label
-        'title'             => __( 'Example Checkbox Input', 'river' ),
+        'title'             => __( 'Example imgselect', 'river' ),
         // (opt) description displayed under the element
-        'desc'              => __( 'This is a description for the Checkbox input.', 'river' ),
-        // default value MUST be integer and 0 or 1
-        'default'           => 1,        
+        'desc'              => __( 'This is a description for the imgselect.', 'river' ),
+        // default value MUST be a string and set to once of the choice keys
+        'default'           => 'imgselect1',        
         // HTML field type
-        'type'              => 'checkbox',        
+        'type'              => 'imgselect',        
         // section these are assigned to
         'section_id'        => 'section1',
+        // Define the choices for the images, i.e. at least 2+
+        'choices' => array(
+            'imgselect1'  => array(
+                'name'      => 'imgselect1',
+                'value'     => __( 'Choice 1', 'river' ),
+                'args'      => array(
+                    'type'      => 'img',
+                    // Image source URL and filename.  This is the image that
+                    // is shown instead of the radio button
+                    'value'     => '',
+                    // Image title
+                    'title'     => '',          
+                    // Image alt
+                    'alt'       => '',                    
+                ),
+            ),
+            'imgselect2' => array(
+                'name'      => 'imgselect2',
+                'value'     => __( 'Choice 2', 'river' ),
+                'args'      => array(
+                    'type'      => 'img',
+                    // Image source URL and filename.  This is the image that
+                    // is shown instead of the radio button
+                    'value'     => '',
+                    // Image title
+                    'title'     => '',          
+                    // Image alt
+                    'alt'       => '',                    
+                ),
+            ),
+            'imgselect3' => array(
+                'name'      => 'imgselect3',
+                'value'     => __( 'Choice 3', 'river' ),
+                'args'      => array(
+                    'type'      => 'img',
+                    // Image source URL and filename.  This is the image that
+                    // is shown instead of the radio button
+                    'value'     => '',
+                    // Image title
+                    'title'     => '',          
+                    // Image alt
+                    'alt'       => '',                    
+                ),
+            ),
+        ),
         
         /** These are the Optional Arguments & do not have to be included *****/
         
@@ -258,12 +275,12 @@
         'class'             => '',
         // (opt) Specify the sanitization filter here; else it's set
         // automatically in the Settings Sanitizer Class
-        'sanitizer_filter'  => 'zero_one',
+        'sanitizer_filter'  => 'no_html',
         // (opt) Specify the validation filter here; else it's set
         // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'zero_one',
+        'validator_filter'  => 'string_choices',
         // (opt) sets an inline style
-        'style'             => '',
+        'style'             => 'display: inline;',
     ); 
     
 /** multicheck ****************************************************************/    
@@ -318,19 +335,6 @@
         // (opt) sets an inline style
         'style'             => '',
     );     
- 
-/** heading *******************************************************************/     
-   // Example 'heading' for a HTML <h4> tag
-    $config['default_settings']['example_heading'] = array(
-        // settings ID for settings array & HTML element
-        'id'                => 'example_heading',
-        // This is the text between the <h4> tags
-        'desc'              => __( 'Example Heading', 'river' ),      
-        // HTML field type
-        'type'              => 'heading',        
-        // section these are assigned to
-        'section_id'        => 'section1',
-    );
     
 /** radio *********************************************************************/    
     // Example 'radio' for a HTML radio fields
@@ -433,99 +437,56 @@
         // (opt) sets an inline style
         'style'             => '',
     );
-    
-/** imgselect *****************************************************************/    
-    // Example 'imgselect', which is a HTML radio buttons but with an image
-    // shown instead of the radio button.  Ways to use may be for page layout
-    // selection, footer layout, etc.
-    $config['default_settings']['example_imgselect'] = array(
+     
+   
+/** text **********************************************************************/   
+   
+   // Example 'text' for a HTML text field
+    $config['default_settings']['example_text'] = array(
         // settings ID for settings array & HTML element
-        'id'                => 'example_imgselect',
+        'id'                => 'example_text',
         // element's label
-        'title'             => __( 'Example imgselect', 'river' ),
+        'title'             => __( 'Example Text Input', 'river' ),
         // (opt) description displayed under the element
-        'desc'              => __( 'This is a description for the imgselect.', 'river' ),
-        // default value MUST be a string and set to once of the choice keys
-        'default'           => 'imgselect1',        
+        'desc'              => __( 'This is a description for the text input.', 'river' ),
+        // default value
+        'default'           => '',        
         // HTML field type
-        'type'              => 'imgselect',        
+        'type'              => 'text',        
         // section these are assigned to
         'section_id'        => 'section1',
-        // Define the choices for the images, i.e. at least 2+
-        'choices' => array(
-            'imgselect1'  => array(
-                'name'      => 'imgselect1',
-                'value'     => __( 'Choice 1', 'river' ),
-                'args'      => array(
-                    'type'      => 'img',
-                    // Image source URL and filename.  This is the image that
-                    // is shown instead of the radio button
-                    'value'     => '',
-                    // Image title
-                    'title'     => '',          
-                    // Image alt
-                    'alt'       => '',                    
-                ),
-            ),
-            'imgselect2' => array(
-                'name'      => 'imgselect2',
-                'value'     => __( 'Choice 2', 'river' ),
-                'args'      => array(
-                    'type'      => 'img',
-                    // Image source URL and filename.  This is the image that
-                    // is shown instead of the radio button
-                    'value'     => '',
-                    // Image title
-                    'title'     => '',          
-                    // Image alt
-                    'alt'       => '',                    
-                ),
-            ),
-            'imgselect3' => array(
-                'name'      => 'imgselect3',
-                'value'     => __( 'Choice 3', 'river' ),
-                'args'      => array(
-                    'type'      => 'img',
-                    // Image source URL and filename.  This is the image that
-                    // is shown instead of the radio button
-                    'value'     => '',
-                    // Image title
-                    'title'     => '',          
-                    // Image alt
-                    'alt'       => '',                    
-                ),
-            ),
-        ),
         
         /** These are the Optional Arguments & do not have to be included *****/
         
         // (opt) add a custom class to the HTML element
         'class'             => '',
+        // (opt) Sets a placeholder in the form's text field
+        'placeholder'       => '',
         // (opt) Specify the sanitization filter here; else it's set
         // automatically in the Settings Sanitizer Class
         'sanitizer_filter'  => 'no_html',
         // (opt) Specify the validation filter here; else it's set
         // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'string_choices',
+        'validator_filter'  => 'string',
         // (opt) sets an inline style
-        'style'             => 'display: inline;',
-    );    
+        'style'             => '',
+    );
 
-/** colorpicker ***************************************************************/
-    // Example 'colorpicker' for a HTML colorpicker field
-    $config['default_settings']['example_colorpicker'] = array(
+/** textarea ******************************************************************/    
+    // Example 'textarea' for a HTML textarea field
+    $config['default_settings']['example_textarea'] = array(
         // settings ID for settings array & HTML element
-        'id'                => 'example_colorpicker',
+        'id'                => 'example_textarea',
         // element's label
-        'title'             => __( 'Example Colorpicker Input', 'river' ),
+        'title'             => __( 'Example Textarea Input', 'river' ),
         // (opt) description displayed under the element
-        'desc'              => __( 'Click on the field to select the new color.', 'river' ),
+        'desc'              => __( 'This is a description for the Textarea input.', 'river' ),
         // default value
-        'default'           => 'FFFFFF',        
+        'default'           => '',        
         // HTML field type
-        'type'              => 'colorpicker',        
+        'type'              => 'textarea',        
         // section these are assigned to
-        'section_id'        => 'section2',
+        'section_id'        => 'section1',
         
         /** These are the Optional Arguments & do not have to be included *****/        
         
@@ -538,11 +499,11 @@
         'sanitizer_filter'  => 'no_html',
         // (opt) Specify the validation filter here; else it's set
         // automatically in the Settings Sanitizer Class        
-        'validator_filter'  => 'hex',
+        'validator_filter'  => 'string',
         // (opt) sets an inline style
         'style'             => '',
-    );
-   
+    );    
+    
 /** upload-image **************************************************************/    
     // Example 'upload-image' for a HTML text field + image previewer
     // Uses WordPress media loader and .jscolor
@@ -575,3 +536,37 @@
         // (opt) sets an inline style
         'style'             => '',
     ); 
+    
+        
+/** url ***********************************************************************/    
+    // Example 'url' for a HTML text field
+    $config['default_settings']['example_url'] = array(
+        // settings ID for settings array & HTML element
+        'id'                => 'example_url',
+        // element's label
+        'title'             => __( 'Example URL Input', 'river' ),
+        // (opt) description displayed under the element
+        'desc'              => __( 'This is a description for the URL input.', 'river' ),
+        // default value
+        'default'           => '',        
+        // HTML field type
+        'type'              => 'url',        
+        // section these are assigned to
+        'section_id'        => 'section1',
+        
+        /** These are the Optional Arguments & do not have to be included *****/
+        
+        // (opt) add a custom class to the HTML element
+        'class'             => '',
+        // (opt) Sets a placeholder in the form's text field
+        'placeholder'       => __( 'http://domain.com', 'river'),
+        // (opt) Specify the sanitization filter here; else it's set
+        // automatically in the Settings Sanitizer Class
+        'sanitizer_filter'  => 'no_html',
+        // (opt) Specify the validation filter here; else it's set
+        // automatically in the Settings Sanitizer Class        
+        'validator_filter'  => 'url',
+        // (opt) sets an inline style
+        'style'             => '',
+    );    
+     

@@ -21,7 +21,7 @@
 	/**
 	 * Tasks on page load
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.4
 	 *
 	 * @function
 	 */
@@ -39,7 +39,7 @@
 	 *
 	 * @function
 	 */
-        navSectionHandler: function() {
+        navSectionHandler: function() {           
 
             // Populate the sections[]
             riverAdmin.nav.find('ul li').each(function(){
@@ -74,15 +74,15 @@
                     $(this).addClass("current");
                 else
                     $(this).addClass("hide");
-            });    
+            });   
 
             // listen for the click event & then scroll to the section
             riverAdmin.navA.on( 'click', function() {
+                
                 // This this section to current
-                $.when(riverAdmin.setCurrent( this, this.hash.substring(1) )).then( riverAdmin.removeURLHash() );
-                $("html, body").animate({ scrollTop: 0 }, "slow");
+                riverAdmin.setCurrent( this, this.hash.substring(1) );
 
-            }); 
+            });        
 
         },
 
@@ -93,7 +93,7 @@
          * It also sets the 'current' and 'hide' for the corresponding
          * content section.
          * 
-         * @since 0.0.0
+         * @since 0.0.4
          * 
          * @function
          * @param obj       $this
@@ -116,6 +116,21 @@
                         .removeClass('hide')
                         .addClass('current')
                         .end();
+                        
+                
+                // Allow a little time for the new section tab to load up
+                setTimeout( function() {
+
+                    // Scroll to the top of the screen if it's not there already
+                    //if( $("html, body").offset().top != 0 ) {
+                        $("html, body").animate({ scrollTop: 0 }, "slow");
+                    //}
+
+                    // Remove the hash from the URL
+                    riverAdmin.removeURLHash();
+                    
+                }, 200);                        
+                        
             } 
         },
        
@@ -220,19 +235,34 @@
             });
         },
         
+	/**
+	 * Removes the hash from the URL
+	 *
+	 * @since 0.0.4
+	 *
+	 * @function
+	 */           
         removeURLHash: function () { 
+            
+            var loc = window.location.search.split('&');               
 
-            riverAdmin.pushState( window.location.search );
-
+            //if url has '&reset=true or &error=true', remove it
+            riverAdmin.pushState( loc[0] );
         },
         
-        pushState: function( finalLocSearch ) {
+	/**
+	 * For HTML5 browsers, we use pushState; others (IE) use loc.hash.
+	 *
+	 * @since 0.0.4
+	 *
+	 * @function
+	 */           
+        pushState: function( finalLocSearch ) {          
             
             var loc = window.location;
-
-// TO DO:  Add modernizer here to check for HTML5 support
+            
             // Need to check if supports HTML5
-            if( true ) {
+            if( ! $.browser.msie ) {
                 
                 history.pushState("", document.title, loc.pathname + finalLocSearch );
                 
@@ -242,7 +272,7 @@
                 
                 if ("pushState" in history) {
                     history.pushState("", document.title, loc.pathname + finalLocSearch );
-                } else {
+                } else {                  
                     // Prevent scrolling by storing the page's current scroll offset
                     scrollV = document.body.scrollTop;
                     scrollH = document.body.scrollLeft;

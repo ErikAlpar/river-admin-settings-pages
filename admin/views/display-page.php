@@ -73,29 +73,17 @@ if ( isset( $this->form['site_url'] ) ) {
             <div class="clearfix"></div>
             <nav id="support">
                 <ul>
-                    <li class="changelog">
+                    <li class="right">
                         <?php 
 
-                        printf( '<a href="%s" title="Changelog" target="_blank">%s</a>',
-                                esc_url( $site_url . $this->form['changelog_url'] ),
-                                esc_html( __( 'View Changelog', 'river' ) ) );
-                        ?>
-                    </li>
-
-                    <li class="docs">
-                        <?php 
-
-                        printf( '<a href="%s" title="Documentation" target="_blank">%s</a>',
-                                esc_url( $site_url . $this->form['docs_url'] ),
-                                esc_html( __( 'View Docs', 'river' ) ) );
-                        ?>
-                    </li>
-                    <li class="forum">
-                        <?php 
-
-                        printf( '<a href="%s" title="Forums" target="_blank">%s</a>',
-                                esc_url( $site_url . $this->form['forum_url'] ),
-                                esc_html( __( 'Visit Forum', 'river' ) ) );
+                        printf( '<input id="reset" class="button reset-button" type="button" value="%1$s" onclick="%2$s">', 
+                                $this->form['button_reset_text'],
+                                'return river_confirm(\'' . 
+                                    esc_js( __( 'Are you sure you want to reset? ' ) )
+                                    . '\n' .
+                                    esc_js( __( 'All settings for this page will be lost & reset back to the default settings.', 'river' ) ) 
+                                    . '\');'                     
+                                ); 
                         ?>
                     </li>
                     <li class="right">

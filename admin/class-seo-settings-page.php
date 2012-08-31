@@ -48,18 +48,10 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
                 'id'                => 'river-seo',
                 // Displayed under the page title
                 'version'           => RIVER_VERSION,
-                // Site URL
-                'site_url'          => 'http://coderiverlabs.com',
-                // Changelog URL
-                'changelog_url'     => '/themes/river/docs/#changelog',
-                // Docs URL
-                'docs_url'          => '/themes/river/docs/',
-                // Forum URL
-                'forum_url'         => '/support/forums/',
                 // Save button text
                 'button_save_text'  => __( 'Save All Changes', 'river' ),             
             ),
-            'page_config' => array(
+            'page' => array(
                 // id for this settings page
                 'id'                => 'river_seo',
                 'submenu'   => array(

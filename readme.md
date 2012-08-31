@@ -21,6 +21,7 @@ River Admin Settings Pages allows theme developers and users to create three dif
 * Data Sanitation prior to saving to the options database. Users define the sanitation filters in the configuration file.
 * User defined help files
 * Plenty of hooks and filters
+* AJAX Saving
 
 ##### Field Types:
 * colorpicker

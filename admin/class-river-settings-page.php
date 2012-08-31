@@ -48,27 +48,17 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                 'id'                => 'river-form',
                 // Displayed under the page title
                 'version'           => RIVER_VERSION,
-                // Site URL
-                'site_url'          => 'http://coderiverlabs.com',
-                // Changelog URL
-                'changelog_url'     => '/themes/river/docs/#changelog',
-                // Docs URL
-                'docs_url'          => '/themes/river/docs/',
-                // Forum URL
-                'forum_url'         => '/support/forums/',
                 // Save button text
                 'button_save_text'  => __( 'Save All Changes', 'river' ),
                 'button_reset_text' => __( 'Reset All Options', 'river' ),
-                'help_file'         => RIVER_ADMIN_DIR . '/views/river-settings-help.php',
             ),
-            'page_config' => array(
+            'page' => array(
                 // id for this settings page
                 'id'                => 'river',
                 'main_menu' => array(
                     'page_title'    => 'River Settings',
                     'menu_title'    => 'River',
                     'capability'    => 'manage_options',
-                    'menu_slug'     => 'river',
                     'icon_url'      => '',
                     'position'      => '58.996',
                     'separator'     => array(
@@ -80,8 +70,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'parent_slug'   => 'river',
                     'page_title'    => __( 'River Settings', 'river' ),
                     'menu_title'    => __( 'River Settings', 'river' ),
-                    'capability'    => 'manage_options',
-                    'menu_slug'     => 'river_settings',  
+                    'capability'    => 'manage_options',  
                 )            
             ),
             'sections' => array(

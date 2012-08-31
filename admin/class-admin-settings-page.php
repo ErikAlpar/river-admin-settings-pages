@@ -25,7 +25,34 @@ if ( !class_exists( 'River_Admin_Settings_Page' ) ) :
  * 
  * @link    http://codex.wordpress.org/Settings_API
  */
-abstract class River_Admin_Settings_Page extends River_Settings_Config {
+abstract class River_Admin_Settings_Page extends River_Admin_Fields {
+    
+    /** Class Parameters ******************************************************/    
+    
+    /**
+     * Config default structure for $config['form']
+     * 
+     * @since 0.0.4
+     * @var array
+     */    
+    protected $config_default_form;
+    
+    /**
+     * Config default structure for $config['page']
+     * 
+     * @since 0.0.4
+     * @var array
+     */      
+    protected $config_default_page;
+    
+    
+    /**
+     * Available Setting Page Types
+     * 
+     * @since 0.0.4
+     * @var array 
+     */
+    protected $available_page_types = array( 'main_page', 'sub_page', 'theme_page' );    
  
     
     /** Constructor & Destructor **********************************************/
@@ -35,14 +62,112 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      * 
      * NOTE:  ONLY INSTANTIATE ONE SETTINGS PAGE AT A TIME!
      * 
-     * @since 0.0.0
+     * @since 0.0.4
      * 
      * @param array     $config Configuration for the new settings page                 
      */
     public function create( $config ) {
         
-        // Validate the incoming $config. If valid, continue; else return.
-        if( ! $this->load_config($config) )
+        $this->config_default_setup();
+        
+        if( ! $config['id'] || ! $config['page']['id'] )        
+            wp_die( sprintf( __( 'Settings page ID is not defined in %s or %s', 
+                    'river' ), '$config[\'id\']',  
+                    '$config[\'page_config\'][\'id\']' ) );        
+
+        if( array_key_exists( $config['type'], $this->available_page_types ) )
+            wp_die( sprintf( __( 'Invalid page type in %s', 
+                    'river' ), '$config[\'type\']' ) );
+        
+        // Setup the filter defaults
+        $this->setup_filter_defaults();
+        
+        $this->page_id          = isset( $config['id'] )             ? $config['id'] : '';
+        $this->settings_group   = isset( $config['settings_group'] ) ? $config['settings_group'] : '';
+        $this->page_type        = isset( $config['type'] )           ? $config['type'] : '';
+        
+        // Return if there's no page ID, settings group, or page type
+        if( ! $this->page_id || ! $this->settings_group || ! $this->page_type )
+            return;        
+         
+        $this->form = isset( $config['form'] ) && is_array( $config['form'] ) ? 
+                wp_parse_args( $config['form'], $this->config_default_form ) : '';
+
+        // Load up the page configuration
+        if ( ( 'main_page' == $this->page_type ) && 
+                isset( $config['page']['main_menu'] ) && is_array( $config['page']['main_menu'] ) &&
+                isset( $config['page']['first_submenu'] ) && is_array( $config['page']['first_submenu'] )) {
+
+            $this->page['main_menu'] = wp_parse_args(
+                    $config['page']['main_menu'], 
+                    $this->config_default_page['main_menu'] );
+
+            $this->page['first_submenu'] = wp_parse_args(
+                    $config['page']['first_submenu'], 
+                    $this->config_default_page['first_submenu'] );             
+
+        } elseif ( ( 'sub_page' == $this->page_type ) && 
+                isset( $config['page']['submenu'] ) && is_array( $config['page']['submenu'] ) ) {
+
+            $this->page['submenu'] = wp_parse_args(
+                    $config['page']['submenu'], 
+                    $this->config_default_page['submenu'] );              
+
+        } elseif ( ( 'theme_page' == $this->page_type ) && 
+                isset( $config['page']['theme'] ) && is_array( $config['page']['theme'] ) ) {
+
+            $this->page['theme'] = wp_parse_args(
+                    $config['page']['theme'], 
+                    $this->config_default_page['theme'] );   
+        }       
+
+        
+        $this->sections = isset( $config['sections'] ) && is_array( $config['sections'] ) ? 
+                $config['sections'] : '';
+        
+        // Return if there's no form, settings group, or page type
+        if( ! $this->form || ! $this->page || ! $this->sections )
+            return;                   
+        
+        if( isset( $config[ 'default_settings' ] ) && is_array( $config[ 'default_settings' ] ) ) {
+            
+            $this->add_field_checker_filter();
+            
+            $default_settings = array();
+            $defaults = array();
+            
+            foreach( $config[ 'default_settings' ] as $key => $setting ) {
+                
+                // Check that the setting type in the config file for this option
+                // is in the available_field_types array.  If no, skip this one.
+                if( ! array_key_exists( $setting['type'], 
+                        $this->get_available_field_types_filters() ) )
+                    return;
+                
+                $setting['sanitizer_filter'] = $this->get_field_sanitizer_filter( $setting );
+                $setting['validator_filter'] = $this->get_field_validator_filter( $setting );
+                if( ! $setting['sanitizer_filter'] || ! $setting['validator_filter'] )                    
+                    return;
+                
+                $response = 
+                    apply_filters( "river_field_checker_{$this->settings_group}", $setting );
+                    
+                if ( RIVER_FIELD_TYPE_ERROR == $response )                   
+                    return;                    
+                    
+                $default_settings[$key] = $response;
+                
+                if ( 'heading' != $setting['type']  )
+                    $defaults[$key] = $setting['default'];                
+                
+            }
+           
+            $this->default_settings = isset( $default_settings ) & is_array( $default_settings ) && ! empty( $default_settings ) ? $default_settings : '';
+            $this->defaults = isset( $defaults ) & is_array( $defaults ) && ! empty( $defaults ) ? $defaults : '';                        
+        }
+
+        // Return if there's no default_settings or defaults
+        if( ! $this->default_settings || ! $this->defaults )
             return;
         
         $this->hooks();
@@ -69,8 +194,8 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
 
         
         // Register the setting - ASSUMES ONE PER PAGE
-        add_action( 'admin_init',       array( &$this, 'register_setting' ) ); 
-        add_action( 'admin_init',       array( $this, 'uploader_setup' ) );
+        add_action( 'admin_init',   array( &$this, 'register_setting' ) ); 
+        add_action( 'admin_init',   array( $this, 'uploader_setup' ) );
         
         add_action( "wp_ajax_river_{$this->settings_group}", array( &$this, 'ajax_save_callback' ) );                   
                
@@ -255,7 +380,7 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      * Hooks to load after the page has been added, as we need to wait until
      * we have a page hook
      * 
-     * @since 0.0.0
+     * @since 0.0.4
      */
     private function after_page_add_hooks() {
         
@@ -267,6 +392,9 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
 
         // Load the Help Tab
         add_action( "load-{$this->page_hook}",  array( $this, 'help_tab' ) ); 
+        
+        // Load the non-ajax save callback
+        add_action( "load-{$this->page_hook}",  array( $this, 'nonajax_save_callback' ) ); 
         
     }
     
@@ -313,7 +441,7 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      * @link    http://codex.wordpress.org/Function_Reference/add_settings_section
      */    
     private function add_sections() {
-        
+
         foreach ( $this->sections as $id => $title ) {
                       
             add_settings_section( 
@@ -338,33 +466,24 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      * @link    http://codex.wordpress.org/Function_Reference/add_settings_field  
      */
     private function add_settings_field() {
+        
+        $this->add_display_field_filter();        
 
         foreach ( $this->default_settings as $id => $setting ) {
-           
-            //$setting['id'] = $id;
-	
-            /**
-             * Parse the setting through the default_settings
-             * If setting is not set, it'll be set to the default.
-             */
-            $setting = wp_parse_args( 
-                    $setting, 
-                    $this->default_structure['default_settings']['default_field'] 
-                    );
 
             // callback args
             $args = array(
                     'id'            => $id,
                     'label_for'     => $id,
-                    'title'         => $setting['title'],
-                    'desc'          => $setting['desc'],
-                    'default'       => $setting['default'],
+                    'title'         => isset( $setting['title'] ) ? $setting['title'] : '',
+                    'desc'          => isset( $setting['desc'] ) ? $setting['desc'] : '',
+                    'default'       => isset( $setting['default'] ) ? $setting['default'] : '',
                     'type'          => $setting['type'],                
-                    'choices'       => $setting['choices'],
-                    'class'         => $setting['class'],
+                    'choices'       => isset( $setting['choices'] ) ? $setting['choices'] : '',
+                    'class'         => isset( $setting['class'] ) ? $setting['class'] : '',
                     'section_id'    => $setting['section_id'],
-                    'style'         => $setting['style'],
-                    'placeholder'   => $setting['placeholder']
+                    'style'         => isset( $setting['style'] ) ? $setting['style'] : '',
+                    'placeholder'   => isset( $setting['placeholder'] ) ? $setting['placeholder'] : '',
             );
 		           
             add_settings_field( 
@@ -444,7 +563,10 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      */
     public function display_setting_callback( $setting ) {
    
-        river_admin_display_settings( $this->settings_group, $setting );
+        $name = $this->get_field_name( $setting['id'] );
+        $value = $this->get_option( $setting['id'] );
+        
+        echo apply_filters( "river_display_field_{$this->settings_group}", $setting, $name, $value );
     }
 
     /**
@@ -454,11 +576,12 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
      *          cannot call $this->settings_group.  To compensate, $this->settings_group
      *          is stored $_POST['type'].
      * 
-     * @since 0.0.3
+     * @since 0.0.4
      */
     function ajax_save_callback() {
         
-        $response = '';              
+        // Default response
+        $response = 'error';              
          
         if( isset( $_POST['type'] ) ) {
             
@@ -468,65 +591,172 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
             if ( function_exists( 'check_ajax_referer' ) )
                 check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
 
-            $data = maybe_unserialize( $_POST['data'] );
-
-            // Check if the data is an array
-            if ( is_array( $data ) ) {
-                $passed_data = $data;
-            // No, so parse it out.
-            } else {
-                parse_str( $data, $passed_data );
-            }
-
-            // One more security check
-            if ( $settings_group == $passed_data['settings_group'] ) {
-                
-                $new_value = $passed_data[$settings_group];
-
-                if( !isset( $new_value ) || ! is_array( $new_value ) || empty( $new_value ) ) {
-                    die( $response );
-                    return;
-                } 
-                
-                // Get the current options db values
-                $options = get_option( $settings_group );                
-
-                // Compare $new_value keys against the defaults.  If there are
-                // differences, something is wrong. Just return & report the error.
-                $key_diff = array_diff_key( $new_value, $options );
-                if ( $key_diff ) {
-                    die( $response );
-                    return;
-                }
-                
-                // If the new values are identical to the current options db
-                // no need to save.
-                if ( $new_value === $options ) {
-                    $response = 'save';
-                } else {  
-                    $response = update_option( $settings_group, $new_value ) ? 'save' : 'error';
-                    
-                    /**
-                     * Check if the new_value is identical to what is
-                     * currently in the options db (this is set in class-settings-sanitizer).
-                     * If yes, then update_option will return FALSE, because
-                     * it did not update.  FALSE in this case is NOT an error.
-                     * Therefore, change $response to TRUE.
-                     */                    
-                    if( isset( $GLOBALS['river-is-seetings-identical-to-db'] ) &&
-                           $GLOBALS['river-is-seetings-identical-to-db'] && 
-                            'error' == $response )
-                        $response = 'nosave';
-                    
-                }
-            }
+            $response = $this->save( $settings_group );
         }
+        
         
         // Pass the response back to AJAX
         die( $response );
-    }    
+    }
+    
+    /**
+     * non-AJAX Save Callback to save all the form's settings|options.
+     * 
+     * @since 0.0.4
+     */    
+    public function nonajax_save_callback() {            
+         
+        if( isset( $_POST['_ajax_nonce'] ) && isset( $_POST['type'] ) && 
+                isset( $_REQUEST['page'] ) && $_REQUEST['page'] == $this->page_id ) {  
+
+            // Default response
+            $response = 'error';              
+                      
+            $settings_group = $_POST['type'];
+            
+            if( $settings_group != $this->settings_group )
+                die ( $response );
+            
+            // check security with nonce.
+            if ( function_exists( 'check_ajax_referer' ) )
+                check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
+            
+            $response = $this->save( $settings_group );
+
+            // Pass the response back to JS $.post Handler
+            die( $response );            
+        }
+    }
+       
   
     /** Helper Functions ******************************************************/
+    /**
+     * Setup the config default arrays, which are used with wp_parse_args
+     * in create();
+     * 
+     * @since 0.0.4
+     */
+    protected function config_default_setup() {
+        
+        $this->config_default_form = apply_filters(
+                'river_config_default_form',
+                array(
+                    'id'                => 'river',
+                    // Displayed under the page title
+                    'version'           => '',
+                    // Save button text
+                    'button_save_text'  => __( 'Save All Changes', 'river' ),
+                    'button_reset_text' => __( 'Reset All Options', 'river' ),
+                )); 
+        
+        $this->config_default_page = apply_filters(
+                'river_config_default_page',
+                array(
+                    // id for this settings page & the menu_slug
+                    'id'                => '',
+                    'main_menu' => array(
+                        'page_title'    => 'River Settings',
+                        'menu_title'    => 'River',
+                        'capability'    => 'manage_options',
+                        'icon_url'      => '',
+                        'position'      => '58.996',
+                        'separator'     => array(
+                            'position'  => '58.995',
+                            'capability'=> 'edit_theme_options',
+                        ),                    
+                    ),
+                    'first_submenu'   => array(
+                        'parent_slug'   => 'river',
+                        'page_title'    => __( 'River Settings', 'river' ),
+                        'menu_title'    => __( 'River Settings', 'river' ),
+                        'capability'    => 'manage_options', 
+                    ),
+                    'submenu'   => array(
+                        'parent_slug'   => 'river',
+                        'page_title'    => '',
+                        'menu_title'    => '',
+                        'capability'    => 'manage_options', 
+                    ),
+                    'theme' => array(
+                        'page_title'    => '',
+                        'menu_title'    => '',
+                        'capability'    => 'manage_options',                    
+                    ),               
+                ));        
+    }
+    
+    /**
+     * Settings Save Handler for both the AJAX and non-AJAX callbacks
+     * 
+     * @since 0.0.4
+     * 
+     * @param type      $settings_group
+     * @return string   Response message: save, nosave, or error
+     */
+    protected function save( $settings_group ) {
+        
+        $response = 'error';
+        
+        $data = maybe_unserialize( $_POST['data'] );
+
+        // Check if the data is an array
+        if ( is_array( $data ) ) {
+            $passed_data = $data;
+        // No, so parse it out.
+        } else {
+            parse_str( $data, $passed_data );
+        }        
+        
+        // One more security check
+        if ( $settings_group == $passed_data['settings_group'] ) {
+            
+            $new_value = $passed_data[$settings_group];
+
+            if( !isset( $new_value ) || ! is_array( $new_value ) || empty( $new_value ) ) {
+                die( $response );
+                return;
+            } 
+
+            // Get the current options db values
+            $options = get_option( $settings_group );                
+
+            // Compare $new_value keys against the defaults.  If there are
+            // differences, something is wrong. Just return & report the error.
+            $key_diff = array_diff_key( $new_value, $options );
+            if ( $key_diff ) {
+                die( $response );
+                return;
+            }
+
+            // If the new values are identical to the current options db
+            // no need to save.
+            if ( $new_value === $options ) {
+                $response = 'save';
+            } else {  
+                $response = update_option( $settings_group, $new_value ) ? 'save' : 'error';
+
+                /**
+                 * Check if the new_value is identical to what is
+                 * currently in the options db (this is set in class-settings-sanitizer).
+                 * If yes, then update_option will return FALSE, because
+                 * it did not update.  FALSE in this case is NOT an error.
+                 * Therefore, change $response to TRUE.
+                 */                    
+                if( isset( $GLOBALS['river-is-settings-identical-to-db'] ) ) {
+                    
+                    if ( $GLOBALS['river-is-settings-identical-to-db'] && 
+                        'error' == $response )
+                        $response = 'nosave';
+                    
+                    // remove the global setting
+                    unset( $GLOBALS['river-is-settings-identical-to-db'] );
+                }
+
+            }
+        }
+        
+        return $response;
+    }     
     
     /**
      * Build and render the Help Tab for this Settings Page.
@@ -636,13 +866,12 @@ abstract class River_Admin_Settings_Page extends River_Settings_Config {
             'resetRequest'      => isset($_REQUEST['reset']) ? $_REQUEST['reset'] : '',
             'formID'            => $this->form['id'],
             'settingsGroup'     => $this->settings_group,
-            'pageID'            => $this->page['id'],
+            'pageID'            => $this->page_id ,
             'riverNonce'        => $river_nonce
         );
         wp_localize_script( 'river-admin-ajax', 'riverAdminAjax', $pass_to_script );
         
     }
-    
   
 } // end of class
 

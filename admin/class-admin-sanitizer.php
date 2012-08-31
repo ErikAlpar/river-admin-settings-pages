@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Validate and Sanitize Settings Class
+ * Validate and Sanitize Settings & Fields Class
  *
  * @category    River 
  * @package     Framework Admin
- * @subpackage  Settings Sanitizer
+ * @subpackage  Admin Sanitizer Class
  * @since       0.0.1
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
@@ -17,7 +17,7 @@
  * Credits:     This code was inspired by the Genesis code and the work that
  *              Mark Jaquith did in Genesis_Settings_Sanitizer.
  */
-if ( !class_exists( 'River_Settings_Sanitizer' ) ) :
+if ( !class_exists( 'River_Admin_Sanitizer' ) ) :
 /**
  * Class for validating and sanitizing both settings for the Admin Settings
  * Pages.
@@ -28,7 +28,7 @@ if ( !class_exists( 'River_Settings_Sanitizer' ) ) :
  * @since       0.0.1
  * 
  */
-abstract class River_Settings_Sanitizer extends River_Admin {
+abstract class River_Admin_Sanitizer extends River_Admin {
     
     /** Class Parameters ******************************************************/    
     
@@ -47,15 +47,6 @@ abstract class River_Settings_Sanitizer extends River_Admin {
      * @var array
      */
     protected $validator_filters;
-    
-    /**
-     * Indicates if sanitizer is functioning on the default settings
-     * 
-     * @since 0.0.0
-     * 
-     * @var bool
-     */
-    protected $is_defaults_sanitizer = FALSE;
     
     /**
      * Indicates if the new sanitized and validated settings are identical
@@ -233,7 +224,7 @@ abstract class River_Settings_Sanitizer extends River_Admin {
             
             // Tell the caller that the new_value is identical to the old_value
             $this->is_settings_identical_to_db = $new_value === $old_value ? TRUE : FALSE;
-            $GLOBALS['river-is-seetings-identical-to-db'] = $this->is_settings_identical_to_db;
+            $GLOBALS['river-is-settings-identical-to-db'] = $this->is_settings_identical_to_db;
             
             return $new_value;
         }
