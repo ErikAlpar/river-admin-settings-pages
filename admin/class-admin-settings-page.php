@@ -829,7 +829,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Enqueue the script files
      * 
-     * @since   0.0.3
+     * @since   0.0.6
      * 
      * @uses    RIVER_ADMIN_URL
      * @uses    RIVER_VERSION
@@ -838,6 +838,8 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * @link    http://codex.wordpress.org/Function_Reference/wp_register_script
      */
     public function load_scripts() {
+        
+        wp_register_script( 'modernizr', RIVER_ADMIN_URL . '/assets/js/modernizr.min.js' );        
         
         wp_register_script( 
                 'river-admin', 
@@ -853,6 +855,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         wp_enqueue_script( 'thickbox' );
         wp_enqueue_script( 'media-upload' );
         
+        wp_enqueue_script( 'modernizr' );
         wp_enqueue_script( 'river-admin' );
         wp_enqueue_script( 'jscolor' );
         wp_enqueue_script( 'river-admin-ajax' );

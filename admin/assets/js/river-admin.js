@@ -253,7 +253,7 @@
 	/**
 	 * For HTML5 browsers, we use pushState; others (IE) use loc.hash.
 	 *
-	 * @since 0.0.4
+	 * @since 0.0.6
 	 *
 	 * @function
 	 */           
@@ -261,8 +261,8 @@
             
             var loc = window.location;
             
-            // Need to check if supports HTML5
-            if( ! $.browser.msie ) {
+            // If this browser supports HTML 5 history, use pushState
+            if( Modernizr.history ) {
                 
                 history.pushState("", document.title, loc.pathname + finalLocSearch );
                 

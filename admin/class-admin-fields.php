@@ -884,7 +884,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the image-uploader field
      * 
-     * @since 0.0.4
+     * @since 0.0.6
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -922,7 +922,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
                     esc_attr( $field['class'] ),
                     esc_attr( $value ) );
             // Delete image
-            echo '<a class="delete-image button" href="#">Remove Image</a>';
+            $output .= '<a class="delete-image button" href="#">Remove Image</a>';
 
         $output .= '</div>';
 
