@@ -8,7 +8,7 @@
 
 **Version**: 0.0.5  
 **Requires at least**: 3.3  
-**Tested up to**: 3.3  
+**Tested up to**: 3.4.1  
 **License**: GPLv2  
 
 ## Description

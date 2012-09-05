@@ -88,7 +88,7 @@
             'section2'          => __( 'Section 2 Name Here', 'river')
         ), 
         // Holds all the settings
-        'default_settings' => array()
+        'default_fields' => array()
     );
 
 
@@ -101,7 +101,7 @@
    
 /** checkbox ******************************************************************/      
     // Example 'checkbox' for a HTML checkbox field
-    $config['default_settings']['example_checkbox'] = array(
+    $config['default_fields']['example_checkbox'] = array(        
         // settings ID for settings array & HTML element
         'id'                => 'example_checkbox',
         // element's label
@@ -131,7 +131,7 @@
     
 /** colorpicker ***************************************************************/
     // Example 'colorpicker' for a HTML colorpicker field
-    $config['default_settings']['example_colorpicker'] = array(
+    $config['default_fields']['example_colorpicker'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_colorpicker',
         // element's label
@@ -163,7 +163,7 @@
     
 /** email *********************************************************************/    
     // Example 'email' for a HTML text field
-    $config['default_settings']['example_email'] = array(
+    $config['default_fields']['example_email'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_email',
         // element's label
@@ -195,7 +195,7 @@
     
 /** heading *******************************************************************/     
    // Example 'heading' for a HTML <h4> tag
-    $config['default_settings']['example_heading'] = array(
+    $config['default_fields']['example_heading'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_heading',
         // This is the text between the <h4> tags
@@ -210,7 +210,7 @@
     // Example 'imgselect', which is a HTML radio buttons but with an image
     // shown instead of the radio button.  Ways to use may be for page layout
     // selection, footer layout, etc.
-    $config['default_settings']['example_imgselect'] = array(
+    $config['default_fields']['example_imgselect'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_imgselect',
         // element's label
@@ -285,7 +285,7 @@
     
 /** multicheck ****************************************************************/    
     // Example 'multicheck' for multiple HTML checkbox fields
-    $config['default_settings']['example_multicheck'] = array(
+    $config['default_fields']['example_multicheck'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_multicheck',
         // element's label
@@ -338,7 +338,7 @@
     
 /** radio *********************************************************************/    
     // Example 'radio' for a HTML radio fields
-    $config['default_settings']['example_radio'] = array(
+    $config['default_fields']['example_radio'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_radio',
         // element's label
@@ -386,7 +386,7 @@
 
 /** select ********************************************************************/   
     // Example 'select' for a HTML select and its option fields
-    $config['default_settings']['example_select'] = array(
+    $config['default_fields']['example_select'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_select',
         // element's label
@@ -442,7 +442,7 @@
 /** text **********************************************************************/   
    
    // Example 'text' for a HTML text field
-    $config['default_settings']['example_text'] = array(
+    $config['default_fields']['example_text'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_text',
         // element's label
@@ -474,7 +474,7 @@
 
 /** textarea ******************************************************************/    
     // Example 'textarea' for a HTML textarea field
-    $config['default_settings']['example_textarea'] = array(
+    $config['default_fields']['example_textarea'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_textarea',
         // element's label
@@ -507,7 +507,7 @@
 /** upload-image **************************************************************/    
     // Example 'upload-image' for a HTML text field + image previewer
     // Uses WordPress media loader and .jscolor
-    $config['default_settings']['example_upload-image'] = array(
+    $config['default_fields']['example_upload-image'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_upload-image',
         // element's label
@@ -540,7 +540,7 @@
         
 /** url ***********************************************************************/    
     // Example 'url' for a HTML text field
-    $config['default_settings']['example_url'] = array(
+    $config['default_fields']['example_url'] = array(
         // settings ID for settings array & HTML element
         'id'                => 'example_url',
         // element's label

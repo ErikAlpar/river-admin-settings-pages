@@ -81,12 +81,12 @@ abstract class River_Admin {
     protected $sections;
     
     /**
-     * Associative array to the default settings
+     * Associative array to the default fields
      * 
      * @since 0.0.0
      * @var array
      */
-    protected $default_settings;     
+    protected $default_fields;     
        
     /**
      * Array of display form ids and classses
@@ -99,10 +99,11 @@ abstract class River_Admin {
     /**
      * Associate array of name/value pairs for each default setting/option
      * 
+     * @since 0.0.0
      * @var array 
      */
-    protected $defaults;  
-    
+    protected $defaults; 
+
     /** Getters ***************************************************************/    
     
     /**
@@ -169,9 +170,10 @@ abstract class River_Admin {
      * @param string    $option_id ID or key for the option
      * @return string   Completed field name
      */
-    public function get_field_name( $option_id ) {        
-        return sprintf( '%s[%s]', $this->settings_group, $option_id );
-    }    
+    public function get_field_name( $option_id, $settings_group = null ) { 
+        $settings_group = isset( $settings_group ) ? $settings_group : $this->settings_group;
+        return sprintf( '%s[%s]', $settings_group, $option_id );
+    }  
     
 }
 endif;

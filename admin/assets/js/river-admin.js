@@ -133,7 +133,7 @@
                         
             } 
         },
-       
+      
 	/**
 	 * Helper function for confirming a user action.
 	 *
@@ -235,6 +235,35 @@
             });
         },
         
+        
+	/**
+	 * When a input or textarea field field is updated, update the character counter.
+	 *
+	 * For now, we can assume that the counter has the same ID as the field, with a _chars
+	 * suffix. In the future, when the counter is added to the DOM with JS, we can add
+	 * a data('counter', 'counter_id_here' ) property to the field element at the same time.
+	 *
+	 * @since 0.0.7
+	 *
+	 * @function
+	 */
+	updateCharacterCount: function() {
+
+            //jQuery('#' + event.target.id + '_chars').html(jQuery(event.target).val().length.toString());           
+            $( '#river_seo_title' ).keyup( function() {
+                var $this = $(this);
+                
+               $( '#' + $this.attr('id') + '_chars' ).val( $this.val().length.toString() ); 
+
+            });
+
+            $( '#river_seo_description' ).keyup( function() {
+                var $this = $(this);
+                    
+               $( '#' + $this.attr('id') + '_chars').val( $this.val().length.toString() ); 
+            });                
+	},          
+        
 	/**
 	 * Removes the hash from the URL
 	 *
@@ -285,7 +314,7 @@
                 }                
             }            
             
-        },
+        },      
         
 	/**
 	 * Time to initialize the river methods
@@ -310,6 +339,9 @@
             riverAdmin.navSectionHandler();
             riverAdmin.imgselectHandler(); 
             riverAdmin.uploadImageHandler();
+            
+            riverAdmin.updateCharacterCount();
+            
         }
 
     };

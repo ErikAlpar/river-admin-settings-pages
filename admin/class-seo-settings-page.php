@@ -66,14 +66,14 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
                 'general'           => __( 'General', 'river'),
                 'section2'          => __( 'Section 2', 'river')
             ), 
-            'default_settings' => array()
+            'default_fields' => array()
         );
 
 
         /** General Section *******************************************************/
 
         // Example 'text' for a HTML text field
-        $config['default_settings']['example_text'] = array(
+        $config['default_fields']['example_text'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_text',
             // element's label
@@ -91,7 +91,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'email' for a HTML text field
-        $config['default_settings']['example_email'] = array(
+        $config['default_fields']['example_email'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_email',
             // element's label
@@ -109,7 +109,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'url' for a HTML text field
-        $config['default_settings']['example_url'] = array(
+        $config['default_fields']['example_url'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_url',
             // element's label
@@ -127,7 +127,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         );     
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['example_textarea'] = array(
+        $config['default_fields']['example_textarea'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_textarea',
             // element's label
@@ -147,7 +147,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         /** Section 2 *************************************************************/    
 
         // Example 'checkbox' for a HTML checkbox field
-        $config['default_settings']['example_checkbox2'] = array(
+        $config['default_fields']['example_checkbox2'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_checkbox2',
             // element's label
@@ -162,7 +162,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
             'section_id'        => 'section2',
         );
 
-        $config['default_settings']['example_multicheck'] = array(
+        $config['default_fields']['example_multicheck'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_multicheck',
             // element's label
@@ -214,7 +214,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'radio' for a HTML radio fields
-        $config['default_settings']['example_radio'] = array(
+        $config['default_fields']['example_radio'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_radio',
             // element's label
@@ -248,7 +248,7 @@ class River_SEO_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'select' for a HTML select and its option fields
-        $config['default_settings']['example_select'] = array(
+        $config['default_fields']['example_select'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_select',
             // element's label

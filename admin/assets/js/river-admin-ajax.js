@@ -69,7 +69,6 @@
 
             if( '' != riverAdminAjax.resetRequest )
                 riverSettings.resetInit = true;
-            
 
             if ( riverSettings.resetInit ) {
 
@@ -92,14 +91,16 @@
 	/**
 	 * Handles the form submit function & AJAX request/handling
 	 *
-	 * @since 0.0.3
+	 * @since 0.0.8
 	 *
 	 * @function
 	 */         
         submit: function() {
             
             //Save everything else
-            riverSettings.form.submit( function() {
+            riverSettings.form.submit( function(event) {
+                
+                event.preventDefault();
                 
                 var unchecked = '';                   
                 var loc = window.location.search.split('&'); 

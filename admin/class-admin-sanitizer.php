@@ -58,6 +58,15 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      */
     protected $is_settings_identical_to_db = FALSE;
     
+    
+    /**
+     * Old value of the metabox custom field
+     * 
+     * @since 0.0.7
+     * @var mixed
+     */
+    protected $mb_old_value = '';    
+    
     /** Class Methods *********************************************************/
     
     /**
@@ -134,10 +143,12 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      * Validate and sanitize a value, via the filter types associated with an
      * option.
      *
-     * @since 0.0.2
+     * @since 0.0.7
      *
      * @param mixed     $new_value New value
-     * @param string    $option Name of the option
+     * @param string    $option Name of the option or metabox
+     * @param bool      $is_option (opt) Set to FALSE for metabox field
+     * @param mixed     $old_value (opt) Metabox field's value
      * @return mixed    Filtered, or unfiltered value
      */
     public function do_validate_sanitize( $new_value, $option ) {
@@ -150,22 +161,25 @@ abstract class River_Admin_Sanitizer extends River_Admin {
 
         // defaults is a single option value
         if ( is_string( $this->defaults ) ) {
+
             // get the old values from the options database
-            $old_value = get_option( $option );            
+            $old_value = get_option( $option );
+                
             return $this->do_sanitizer_filter( 
-                    $this->default_settings['sanitizer_filter'], 
+                    $this->default_fields['sanitizer_filter'], 
                     $new_value, 
                     $old_value );
         
         // defaults is an array
         } elseif ( is_array( $this->defaults ) ) {
+
             // get the old values from the options database
             $old_value = get_option( $option );
             
-            foreach ( $this->default_settings as $key => $setting ) {
+            foreach ( $this->default_fields as $key => $field ) {
                 
                 // We don't store a heading type in the options database
-                if ( 'heading' == $setting['type'] )
+                if ( 'heading' == $field['type'] )
                     continue;
                 
                 $old_value[$key] = isset( $old_value[$key] ) ? $old_value[$key] : '';
@@ -180,23 +194,12 @@ abstract class River_Admin_Sanitizer extends River_Admin {
 
                         foreach( $new_value[$key] as $sub_key => $sub_value) {
                             
-                            if( $new_value[$key] !== $old_value[$key] ) {
+                            $temp_new_value[$sub_key] = $this->run( 
+                                    $sub_value, $old_value[$key], $sub_key, $key, 
+                                    $field['validator_filter'], 
+                                    $field['sanitizer_filter'] );                              
 
-                                $temp_new_value[$sub_key] = $this->do_validator_filter( 
-                                        $setting['validator_filter'], 
-                                        $sub_value, $old_value[$key], $sub_key, $key );
-
-                                if ( $temp_new_value === $old_value[$key] )
-                                    break;                                
-                            }
-
-                            // Pass through the sanitizer filter and store updated value
-                            $temp_new_value[$sub_key] = $this->do_sanitizer_filter( 
-                                    $setting['sanitizer_filter'], 
-                                    $sub_value, $old_value[$key] );
-
-
-                            if( $temp_new_value == $old_value[$key] )
+                            if( $temp_new_value === $old_value[$key] )
                                 break;
                         }
 
@@ -206,32 +209,98 @@ abstract class River_Admin_Sanitizer extends River_Admin {
                 // This option is not an array    
                 } else {
                     
-                    // if the new value = old value, then no need to validate
-                    if( ( $new_value[$key] !== $old_value[$key] ) ) {
-                        // Pass through the validator filter first and store updated value
-                        $new_value[$key] = $this->do_validator_filter( 
-                                $setting['validator_filter'], 
-                                $new_value[$key], $old_value[$key], $new_value[$key], $key );
-                    }
-                    
-                    // Pass through the sanitizer filter and store updated value
-                    $new_value[$key] = $this->do_sanitizer_filter( 
-                            $setting['sanitizer_filter'], 
-                            $new_value[$key], $old_value[$key] );
-
+                    $new_value[$key] = $this->run( 
+                            $new_value[$key], $old_value[$key], 
+                            $new_value[$key], $key,
+                            $field['validator_filter'], 
+                            $field['sanitizer_filter'] );
                 }
             }
-            
-            // Tell the caller that the new_value is identical to the old_value
+
             $this->is_settings_identical_to_db = $new_value === $old_value ? TRUE : FALSE;
             $GLOBALS['river-is-settings-identical-to-db'] = $this->is_settings_identical_to_db;
-            
+
             return $new_value;
         }
         
         // We should never hit this, but just to be safe....
         return $new_value;
 
+    }
+    
+    /**
+     * Validate and sanitize a value, via the filter types associated with an
+     * option.
+     *
+     * @since 0.0.7
+     *
+     * @param mixed     $new_value New value
+     * @param string    $option Name of the option or metabox
+     * @param bool      $is_option (opt) Set to FALSE for metabox field
+     * @param mixed     $old_value (opt) Metabox field's value
+     * @return mixed    Filtered, or unfiltered value
+     */
+    public function do_mb_validate_sanitize( $field_name, $new_value, $old_value ) {
+
+        if( ! array_key_exists( $field_name, $this->default_fields ) )
+                return 'ERROR';
+        
+        if ( is_array( $new_value ) ) {
+            
+            if ( empty( $new_value) )
+                return $new_value;
+            
+            foreach( $new_value as $key => $value ) {
+
+                $temp_new_value = $this->run( $value, $old_value, $key, $field_name,
+                        $this->default_fields[$field_name]['validator_filter'], 
+                        $this->default_fields[$field_name]['sanitizer_filter'] );                
+                
+                    if( $temp_new_value == $old_value )
+                        break;
+                }
+
+                $new_value[$key] = $temp_new_value;
+            
+        } else {
+            
+            $new_value = $this->run( $new_value, $old_value, $new_value, $field_name,
+                    $this->default_fields[$field_name]['validator_filter'], 
+                    $this->default_fields[$field_name]['sanitizer_filter'] );
+        }
+        return $new_value;
+
+    }
+    
+    /**
+     * 
+     * 
+     * @since 0.0.8
+     * 
+     * @param type $new_value
+     * @param type $old_value
+     * @param type $options_key
+     * @param type $key
+     * @param type $validator_filter
+     * @param type $sanitizer_filter
+     * @return mixed
+     */
+    private function run( $new_value, $old_value, $options_key, $key,
+            $validator_filter, $sanitizer_filter ) {
+        
+        // if the new value = old value, then no need to validate
+        if( ( $new_value !== $old_value ) ) {
+            // Pass through the validator filter first and store updated value
+            $new_value = $this->do_validator_filter( 
+                    $validator_filter, $new_value, $old_value, $options_key, $key );
+        }
+
+        // Pass through the sanitizer filter and store updated value
+        $new_value = $this->do_sanitizer_filter( 
+                $sanitizer_filter, $new_value, $old_value );
+        
+        return $new_value;
+        
     }
 
     /** Sanitizer Filter ******************************************************/  
@@ -454,9 +523,8 @@ abstract class River_Admin_Sanitizer extends River_Admin {
         
         $new_value = is_numeric( $new_value ) ? (int) $new_value : $new_value;
         
-        return is_bool( $new_value )|| 
-            ( ( is_integer( $new_value ) && $new_value == 0 || $new_value == 1 ) ) ? 
-            $new_value : $old_value;
+        return is_bool( $new_value )|| $new_value === 0 || $new_value === 1  ? 
+                $new_value : $old_value;
         
     }
     
@@ -481,7 +549,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      */     
     function v_boolean_multi( $new_value, $old_value, $option_key, $id ) {
         
-        return array_key_exists( $option_key, $this->default_settings[$id]['choices'] ) ? 
+        return array_key_exists( $option_key, $this->default_fields[$id]['choices'] ) ? 
                 $this->v_boolean($new_value, $old_value) : $old_value;
         
     }      
@@ -626,7 +694,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
         if ( empty ( $new_value ) )
             return $new_value;
         
-        return array_key_exists( $option_key, $this->default_settings[$id]['choices'] ) ? 
+        return array_key_exists( $option_key, $this->default_fields[$id]['choices'] ) ? 
                 $new_value : $old_value;
         
     }    

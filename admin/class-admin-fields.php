@@ -530,7 +530,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Checkbox field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -539,13 +539,11 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_checkbox( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';        
-        
+
         $output = sprintf( '<input id="%1$s" class="checkbox%2$s" type="checkbox" ' .
                 'name="%3$s" value="1" %4$s />',
                 esc_attr( $field['id'] ),
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),
                 checked( $value, 1, false ) );
 
@@ -560,7 +558,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Colorpicker field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -569,13 +567,11 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_colorpicker( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';        
-        
+
         return sprintf( '<input id="%1$s" class="color%2$s" name="%3$s" ' .
                 'value="%4$s" />', 
                 esc_attr( $field['id'] ),
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),
                 esc_attr( $value ) );        
         
@@ -617,7 +613,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the imgselect field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -626,9 +622,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_imgselect( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';        
-        
+
         $output = sprintf( '<div id="%s" class="imgselect">', esc_attr( $field['id'] ) );
 
         foreach ( $field['choices'] as $key => $choice ) {
@@ -640,7 +634,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s" class="radio%2$s" type="radio" ' .
                     'name="%3$s" value="%1$s" %4$s /><br>',
                     esc_attr( $key ),
-                    esc_attr( $field['class'] ),
+                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                     esc_attr( $name ),
                     checked( $value, $key, false ) );
 
@@ -668,7 +662,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Multicheck field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -677,8 +671,6 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_multicheck( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';
 
         $checked = isset( $value ) ? $value : '0';
 
@@ -696,7 +688,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s%6$s" class="multicheck%2$s" type="checkbox" ' .
                     'name="%3$s[%4$s]" value="%4$s" %5$s data-key="%1$s"/>',
                     esc_attr( $field['id'] ),
-                    esc_attr( $field['class'] ),
+                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                     esc_attr( $name ),
                     esc_attr ( $key ),
                     isset( $is_checked ) ? 'checked="checked"' : '',
@@ -722,7 +714,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Radio field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -731,9 +723,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_radio( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';
-        
+
         $output = '<ul class="radio">';   
         $i = 0;
         foreach ( $field['choices'] as $key => $choice ) {
@@ -742,7 +732,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s%6$s" class="radio%2$s" type="radio" ' .
                     'name="%3$s" value="%4$s" %5$s />',
                     esc_attr( $field['id'] ),
-                    esc_attr( $field['class'] ),
+                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                     esc_attr( $name ),
                     esc_attr ( $key ),
                     checked( $value, $key, false ),
@@ -767,7 +757,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Select field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -776,11 +766,9 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_select( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';
-        
+
         $output = sprintf ( '<select class="select%1$s" name="%2$s">',
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ) );
 
         // Now load up each of the other <options> in 'choices'
@@ -805,7 +793,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Text field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -814,16 +802,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_text( $field, $name, $value ) {
-        
-        $field['class'] ? " {$field['class']}" : '';
-        
+         
         $output = sprintf( '<input id="%1$s" class="regular-text%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" placeholder="%5$s" />',
                 esc_attr( $field['id'] ),
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ),                        
-                $field['placeholder'] ? esc_attr( $field['placeholder'] ) : '' );
+                isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
@@ -835,7 +821,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Textarea field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -845,15 +831,13 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      */
     public function d_textarea( $field, $name, $value ) {
         
-        $field['class'] ? " {$field['class']}" : '';
-        
         $output = sprintf( '<textarea id="%1$s" class="textarea%2$s" ' .
                 'name="%3$s" placeholder="%4$s"  rows="5" cols="30">' .
                 '%5$s</textarea>',
                 esc_attr( $field['id'] ),
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),
-                $field['placeholder'] ? esc_attr( $field['placeholder'] ) : '',
+                isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '',
                 esc_attr( $value ) );
 
         if ( ! empty( $field['desc'] ) )
@@ -867,7 +851,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Timepicker field
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -877,14 +861,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      */
     public function d_timepicker( $field, $name, $value ) {
                 
-        $field['class'] ? " {$field['class']}" : '';
+
         
     }
     
     /**
      * Display | Render the image-uploader field
      * 
-     * @since 0.0.6
+     * @since 0.0.7
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -894,12 +878,10 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      */
     public function d_upload_image( $field, $name, $value ) {
                 
-        $field['class'] ? " {$field['class']}" : '';
-        
         $output = sprintf( '<input id="%1$s" class="upload-url%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" />',
                 esc_attr( $field['id'] ),
-                esc_attr( $field['class'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ) );                        
 
@@ -919,7 +901,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             // Display the image tag
             $output .= sprintf( '<img id="%1$s" class="upload-url%2$s" src="%3$s" />',
                     esc_attr( $field['id'] ),
-                    esc_attr( $field['class'] ),
+                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                     esc_attr( $value ) );
             // Delete image
             $output .= '<a class="delete-image button" href="#">Remove Image</a>';

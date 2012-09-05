@@ -48,9 +48,6 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                 'id'                => 'river-form',
                 // Displayed under the page title
                 'version'           => RIVER_VERSION,
-                // Save button text
-                'button_save_text'  => __( 'Save All Changes', 'river' ),
-                'button_reset_text' => __( 'Reset All Options', 'river' ),
             ),
             'page' => array(
                 // id for this settings page
@@ -79,14 +76,14 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                 'appearance'        => __( 'Appearance', 'river'),
                 'scripts'           => __( 'Scripts', 'river')            
             ), 
-            'default_settings' => array()
+            'default_fields' => array()
         );
 
 
         /** General Section *******************************************************/
 
         // Example 'text' for a HTML text field
-        $config['default_settings']['example_text'] = array(
+        $config['default_fields']['example_text'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_text',
             // element's label
@@ -104,7 +101,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'email' for a HTML text field
-        $config['default_settings']['example_email'] = array(
+        $config['default_fields']['example_email'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_email',
             // element's label
@@ -122,7 +119,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'url' for a HTML text field
-        $config['default_settings']['example_url'] = array(
+        $config['default_fields']['example_url'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_url',
             // element's label
@@ -140,7 +137,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );     
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['example_textarea'] = array(
+        $config['default_fields']['example_textarea'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_textarea',
             // element's label
@@ -160,7 +157,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         /** Section 2 *************************************************************/    
 
         // Example 'checkbox' for a HTML checkbox field
-        $config['default_settings']['example_checkbox'] = array(
+        $config['default_fields']['example_checkbox'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_checkbox',
             // element's label
@@ -175,7 +172,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
             'section_id'        => 'section2',
         );
 
-        $config['default_settings']['example_multicheck'] = array(
+        $config['default_fields']['example_multicheck'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_multicheck',
             // element's label
@@ -227,7 +224,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'radio' for a HTML radio fields
-        $config['default_settings']['example_radio'] = array(
+        $config['default_fields']['example_radio'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_radio',
             // element's label
@@ -261,7 +258,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );    
 
         // Example 'select' for a HTML select and its option fields
-        $config['default_settings']['example_select'] = array(
+        $config['default_fields']['example_select'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_select',
             // element's label
@@ -302,12 +299,12 @@ class River_Settings_Page extends River_Admin_Settings_Page {
 
 
 
-        /** Appearance Section ****************************************************/
+        /** Appearance Section ************************************************/
 
         // Example 'imgselect', which is a HTML radio buttons but with an image
         // shown instead of the radio button.  Ways to use may be for page layout
         // selection, footer layout, etc.    
-        $config['default_settings']['main_layout'] = array(
+        $config['default_fields']['main_layout'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'main_layout',
             // element's label
@@ -328,7 +325,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                         'type'      => 'img',
                         // Image source URL and filename.  This is the image that
                         // is shown instead of the radio button                    
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/1c.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/content.gif',
                         // Image title
                         'title'     => 'Content', 
                         // Image alt
@@ -340,7 +337,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'value'     => __( 'Layout 2', 'river' ),
                     'args'      => array(
                         'type'      => 'img',
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/2cl.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/content-sidebar.gif',
                         'title'     => 'Content-Sidebar',          
                         'alt'       => 'Content-Sidebar',                    
                     ),
@@ -350,7 +347,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'value'     => __( 'Layout 3', 'river' ),
                     'args'      => array(
                         'type'      => 'img',
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/2cr.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/sidebar-content.gif',
                         'title'     => 'Sidebar-Content',          
                         'alt'       => 'Sidebar-Content',                    
                     ),
@@ -360,7 +357,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'value'     => __( 'Layout 4', 'river' ),
                     'args'      => array(
                         'type'      => 'img',
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/3cl.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/content-sidebar-sidebar.gif',
                         'title'     => 'Content-Sidebar-Sidebar',          
                         'alt'       => 'Content-Sidebar-Sidebar',                    
                     ),
@@ -370,7 +367,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'value'     => __( 'Layout 5', 'river' ),
                     'args'      => array(
                         'type'      => 'img',
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/3cm.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/sidebar-content-sidebar.gif',
                         'title'     => 'Sidebar-Content-Sidebar',          
                         'alt'       => '',                    
                     ),
@@ -380,7 +377,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
                     'value'     => __( 'Layout 6', 'river' ),
                     'args'      => array(
                         'type'      => 'img',
-                        'value'     => RIVER_ADMIN_URL . '/assets/images/3cr.png',
+                        'value'     => RIVER_ADMIN_URL . '/assets/images/sidebar-sidebar-content.gif',
                         'title'     => 'Sidebar-Sidebar-Content',          
                         'alt'       => 'Sidebar-Sidebar-Content',                    
                     ),
@@ -389,7 +386,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
             'style' => 'display: inline;',
         ); 
 
-        $config['default_settings']['footer_layout'] = array(
+        $config['default_fields']['footer_layout'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'footer_layout',
             // element's label
@@ -462,7 +459,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'colorpicker' for a HTML colorpicker field
-        $config['default_settings']['example_colorpicker'] = array(
+        $config['default_fields']['example_colorpicker'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'example_colorpicker',
             // element's label
@@ -480,7 +477,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
 
         // Example 'upload-image' for a HTML text field + image previewer
         // Uses WordPress media loader and .jscolor
-        $config['default_settings']['header_logo'] = array(
+        $config['default_fields']['header_logo'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'header_logo',
             // element's label
@@ -498,7 +495,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
 
         // Example 'upload-image' for a HTML text field + image previewer
         // Uses WordPress media loader and .jscolor
-        $config['default_settings']['favicon'] = array(
+        $config['default_fields']['favicon'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'favicon',
             // element's label
@@ -515,7 +512,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['custom_css'] = array(
+        $config['default_fields']['custom_css'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'custom_css',
             // element's label
@@ -546,7 +543,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );  
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['tracking_code'] = array(
+        $config['default_fields']['tracking_code'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'tracking_code',
             // element's label
@@ -577,7 +574,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['header_scripts'] = array(
+        $config['default_fields']['header_scripts'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'header_scripts',
             // element's label
@@ -608,7 +605,7 @@ class River_Settings_Page extends River_Admin_Settings_Page {
         );
 
         // Example 'textarea' for a HTML textarea field
-        $config['default_settings']['footer_scripts'] = array(
+        $config['default_fields']['footer_scripts'] = array(
             // settings ID for settings array & HTML element
             'id'                => 'footer_scripts',
             // element's label

@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Page Class
- * @since       0.0.0
+ * @since       0.0.7
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -21,7 +21,7 @@ if ( !class_exists( 'River_Admin_Settings_Page' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.0
+ * @since       0.0.7
  * 
  * @link    http://codex.wordpress.org/Settings_API
  */
@@ -62,7 +62,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * 
      * NOTE:  ONLY INSTANTIATE ONE SETTINGS PAGE AT A TIME!
      * 
-     * @since 0.0.4
+     * @since 0.0.7
      * 
      * @param array     $config Configuration for the new settings page                 
      */
@@ -70,12 +70,12 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         
         $this->config_default_setup();
         
-        if( ! $config['id'] || ! $config['page']['id'] )        
+        if( ! isset( $config['id'] ) || ! isset( $config['page']['id'] ) )        
             wp_die( sprintf( __( 'Settings page ID is not defined in %s or %s', 
                     'river' ), '$config[\'id\']',  
                     '$config[\'page_config\'][\'id\']' ) );        
 
-        if( array_key_exists( $config['type'], $this->available_page_types ) )
+        if( ! in_array( $config['type'], $this->available_page_types ) )
             wp_die( sprintf( __( 'Invalid page type in %s', 
                     'river' ), '$config[\'type\']' ) );
         
@@ -129,14 +129,14 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         if( ! $this->form || ! $this->page || ! $this->sections )
             return;                   
         
-        if( isset( $config[ 'default_settings' ] ) && is_array( $config[ 'default_settings' ] ) ) {
+        if( isset( $config[ 'default_fields' ] ) && is_array( $config[ 'default_fields' ] ) ) {
             
             $this->add_field_checker_filter();
             
-            $default_settings = array();
+            $default_fields = array();
             $defaults = array();
             
-            foreach( $config[ 'default_settings' ] as $key => $setting ) {
+            foreach( $config[ 'default_fields' ] as $key => $setting ) {
                 
                 // Check that the setting type in the config file for this option
                 // is in the available_field_types array.  If no, skip this one.
@@ -155,19 +155,19 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
                 if ( RIVER_FIELD_TYPE_ERROR == $response )                   
                     return;                    
                     
-                $default_settings[$key] = $response;
+                $default_fields[$key] = $response;
                 
                 if ( 'heading' != $setting['type']  )
                     $defaults[$key] = $setting['default'];                
                 
             }
            
-            $this->default_settings = isset( $default_settings ) & is_array( $default_settings ) && ! empty( $default_settings ) ? $default_settings : '';
+            $this->default_fields = isset( $default_fields ) & is_array( $default_fields ) && ! empty( $default_fields ) ? $default_fields : '';
             $this->defaults = isset( $defaults ) & is_array( $defaults ) && ! empty( $defaults ) ? $defaults : '';                        
         }
 
-        // Return if there's no default_settings or defaults
-        if( ! $this->default_settings || ! $this->defaults )
+        // Return if there's no default_fields or defaults
+        if( ! $this->default_fields || ! $this->defaults )
             return;
         
         $this->hooks();
@@ -469,7 +469,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         
         $this->add_display_field_filter();        
 
-        foreach ( $this->default_settings as $id => $setting ) {
+        foreach ( $this->default_fields as $id => $setting ) {
 
             // callback args
             $args = array(
@@ -594,7 +594,6 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
             $response = $this->save( $settings_group );
         }
         
-        
         // Pass the response back to AJAX
         die( $response );
     }
@@ -641,7 +640,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         $this->config_default_form = apply_filters(
                 'river_config_default_form',
                 array(
-                    'id'                => 'river',
+                    'id'                => 'river-form',
                     // Displayed under the page title
                     'version'           => '',
                     // Save button text

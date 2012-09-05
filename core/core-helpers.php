@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Core
  * @subpackage  Helpers
- * @since       0.0.0
+ * @since       0.0.8
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -172,5 +172,39 @@ if( ! $return_all )
 return $options_cache;
 //return $options_db_cache;
 
+}
+
+/**
+ * Get and return the post's custom field meta data
+ * 
+ * @since 0.0.8
+ * 
+ * @global integer      $id Post ID (inside of The Loop)
+ * @global stdClass     $post WordPress Post object
+ * @param string        $field_name Custom field's Name (id)
+ * @return bool|string  Returns sanitized value or false
+ */
+function river_get_custom_field( $field_name ) {
+    
+    global $id, $post;
+
+    if ( is_null( $id ) && is_null( $post ) )
+        return NULL;
+
+    $post_id = is_null( $id )? $post->ID : $id;
+
+    $custom_field = get_post_meta( $post_id, $field_name, true );
+
+    // Sanitize and then return the custom field's value
+    if ( ! is_null( $custom_field ) ) {
+        
+        return is_array( $custom_field ) ? 
+            stripslashes_deep( $custom_field ): 
+            stripslashes( wp_kses_decode_entities( $custom_field ) );
+    }
+
+    // Return FALSE if custom field is empty
+    return NULL;    
+    
 }
 
