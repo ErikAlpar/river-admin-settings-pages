@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Page Class
- * @since       0.0.7
+ * @since       0.0.9
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -21,7 +21,7 @@ if ( !class_exists( 'River_Admin_Settings_Page' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.7
+ * @since       0.0.9
  * 
  * @link    http://codex.wordpress.org/Settings_API
  */
@@ -62,7 +62,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * 
      * NOTE:  ONLY INSTANTIATE ONE SETTINGS PAGE AT A TIME!
      * 
-     * @since 0.0.7
+     * @since 0.0.9
      * 
      * @param array     $config Configuration for the new settings page                 
      */
@@ -158,7 +158,10 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
                 $default_fields[$key] = $response;
                 
                 if ( 'heading' != $setting['type']  )
-                    $defaults[$key] = $setting['default'];                
+                    $defaults[$key] = $setting['default'];
+                
+                if ( 'timepicker' == $setting['type']  )
+                    $this->timepickers[] = $setting;                
                 
             }
            
@@ -577,6 +580,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      *          is stored $_POST['type'].
      * 
      * @since 0.0.4
+     * @link http://codex.wordpress.org/Function_Reference/check_ajax_referer
      */
     function ajax_save_callback() {
         
@@ -590,6 +594,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
             // check security with nonce.
             if ( function_exists( 'check_ajax_referer' ) )
                 check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
+ 
 
             $response = $this->save( $settings_group );
         }
@@ -811,14 +816,17 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Enqueue the Style files
      * 
-     * @since   0.0.5
+     * @since   0.0.9
      * 
      * @link    http://codex.wordpress.org/Function_Reference/wp_enqueue_style
      */
     public function load_styles() {
-        
-        wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/river-admin.css' );  
+
+        wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/river-admin.css' );
+        wp_register_style( 'jquery_timepicker_css', RIVER_ADMIN_URL . '/assets/css/jquery.timepicker.css' ); 
+
         wp_enqueue_style( 'river_admin_css' );
+        wp_enqueue_style( 'jquery_timepicker_css' );        
         
         // Media Uploader Stylesheet
         wp_enqueue_style( 'thickbox' );
@@ -828,7 +836,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Enqueue the script files
      * 
-     * @since   0.0.6
+     * @since   0.0.9
      * 
      * @uses    RIVER_ADMIN_URL
      * @uses    RIVER_VERSION
@@ -836,42 +844,45 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * @uses    wp_register_script()
      * @link    http://codex.wordpress.org/Function_Reference/wp_register_script
      */
-    public function load_scripts() {
-        
-        wp_register_script( 'modernizr', RIVER_ADMIN_URL . '/assets/js/modernizr.min.js' );        
+    public function load_scripts() {       
         
         wp_register_script( 
                 'river-admin', 
                 RIVER_ADMIN_URL . '/assets/js/river-admin.js', 
-                array( 'jquery', 'media-upload', 'thickbox' ), 
-                '', 
-                true); 
+                array( 'jquery', 'media-upload', 'thickbox', 
+                    'jquery-ui-datepicker', 'jquery-ui-core' ), 
+                '0.0.9', true ); 
+        
         // @link http://jscolor.com/
         wp_register_script( 'jscolor', RIVER_ADMIN_URL . '/assets/js/jscolor.js', '', '', true); 
+        wp_register_script( 'jquery-river', RIVER_ADMIN_URL . '/assets/js/jquery.river.min.js', '', '0.0.9'); 
         wp_register_script( 'river-admin-ajax', RIVER_ADMIN_URL . '/assets/js/river-admin-ajax.js' );
 
-        wp_enqueue_script('jquery');
-        wp_enqueue_script( 'thickbox' );
-        wp_enqueue_script( 'media-upload' );
-        
-        wp_enqueue_script( 'modernizr' );
         wp_enqueue_script( 'river-admin' );
         wp_enqueue_script( 'jscolor' );
+        wp_enqueue_script( 'jquery-river' );        
         wp_enqueue_script( 'river-admin-ajax' );
+        
         
         if ( function_exists( 'wp_create_nonce' ) ) 
             $river_nonce = wp_create_nonce( $this->settings_group . '-options-update' );        
 
         // Variables to pass to the riverAdminAjax script
         $pass_to_script = array(
-            'ajaxurl'           => admin_url( 'admin-ajax.php' ),
-            'resetRequest'      => isset($_REQUEST['reset']) ? $_REQUEST['reset'] : '',
-            'formID'            => $this->form['id'],
-            'settingsGroup'     => $this->settings_group,
-            'pageID'            => $this->page_id ,
-            'riverNonce'        => $river_nonce
+            'ajax_url'           => admin_url( 'admin-ajax.php' ),
+            'reset_request'      => isset($_REQUEST['reset']) ? $_REQUEST['reset'] : 'false',
+            'form_id'            => $this->form['id'],
+            'settings_group'     => $this->settings_group,
+            'page_id'            => $this->page_id ,
+            'river_nonce'        => $river_nonce
         );
         wp_localize_script( 'river-admin-ajax', 'riverAdminAjax', $pass_to_script );
+        
+        // Variables to pass to the riverAdmin script
+        $pass_to_river_admin = array(
+            'timepicker'     => $this->timepickers,
+        );
+        wp_localize_script( 'river-admin', 'riverAdminParams', $pass_to_river_admin );          
         
     }
   

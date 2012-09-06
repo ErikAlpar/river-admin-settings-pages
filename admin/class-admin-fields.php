@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Fields Class
- * @since       0.0.4
+ * @since       0.0.9
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -20,9 +20,21 @@ if ( !class_exists( 'River_Admin_Fields' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.4
+ * @since       0.0.9
  */
 abstract class River_Admin_Fields extends River_Admin_Sanitizer {
+    
+    /** Class Parameters ******************************************************/    
+    
+    /**
+     * Array of all the configured timepickers
+     * 
+     * Used to pass to the javascript for the timepickers script
+     * 
+     * @since 0.0.9
+     * @var array
+     */     
+    protected $timepickers = array();
     
     /** Field Sanitizer & Validator Filters ***********************************/  
     
@@ -144,7 +156,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      * Array can be filtered via 'river_available_field_type_filters' to let
      * child themes and plugins add their own filters.
      *
-     * @since 0.0.4
+     * @since 0.0.9
      *
      * @return array    Associative array containing the filter types
      *                  as the keys and filter method callback as the values
@@ -163,9 +175,10 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
                 'select'            => array( $this, 'f_choices'        ),            
                 'text'              => array( $this, 'f_text'           ),
                 'textarea'          => array( $this, 'f_text'           ),
-                'timepicker'        => array( $this, 'f_text'           ),
+                'timepicker'        => array( $this, 'f_timepicker'     ),
                 'upload-image'      => array( $this, 'f_text'           ),
                 'url'               => array( $this, 'f_text'           ),
+                'wysiwyg'           => array( $this, 'f_wysiwyg'        ),
         );        
 
         return apply_filters( 'river_available_field_type_filters', $default_filters );
@@ -336,6 +349,198 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         // Check if default is set and is an integer
         return is_string( $field['default'] ) ? $field : RIVER_FIELD_TYPE_ERROR;    
     }
+    
+    /**
+     * Text checker: checks key structure and default value is a string.
+     * 
+     * @uses RIVER_FIELD_TYPE_ERROR
+     * 
+     * @since 0.0.4
+     * 
+     * @param array     $field The field to check
+     * @return str|arr  Returns the $field array if it passes the checks;
+     *                  else returns error message 
+     */    
+    public function f_timepicker( $field ) {
+        
+        $args = array(
+            'id'                => '',
+            'title'             => '',
+            'desc'              => '',
+            'default'           => '',
+            'type'              => '',
+            'section_id'        => '',
+            'class'             => '',
+            'placeholder'       => '',            
+            'sanitizer_filter'  => '',
+            'validator_filter'  => '',
+            'style'             => '',
+            'args'  => array(
+                /** Options ***************************************************/
+                
+                // The character to use to separate hours and minutes. (default: ':')
+                'time_separator'                => ':',
+                //Define whether or not to show a leading zero for hours < 10. (default: true)
+                'show_leading_zero'             => 'true',
+                // Define whether or not to show a leading zero for minutes < 10. (default: true)
+                'show_minutes_leading_zero'     => 'true',
+                // Define whether or not to show AM/PM with selected time. (default: false)
+                'show_period'                   => 'false',
+                // Define if the AM/PM labels on the left are displayed. (default: true)
+                'show_period_labels'            => 'true',
+                // The character to use to separate the time from the time period.
+                'period_separator'              => ' ',
+                // Define an alternate input to parse selected time to
+                'alt_field'                     => '#alternate_input',
+                // Used as default time when input field is empty or for inline timePicker
+                // (set to 'now' for the current time, '' for no highlighted time,
+                // default value: 'now')
+                'default_time'                  => 'now',
+                
+                /** trigger options *******************************************/
+                // Define when the timepicker is shown.
+                // 'focus': when the input gets focus, 'button' when the button trigger element is clicked,
+                // 'both': when the input gets focus and when the button is clicked.
+                'show_on'                       => 'focus',
+                // jQuery selector that acts as button trigger. ex: '#trigger_button'
+                'button'                        => 'null',
+                
+                /** Localization **********************************************/
+                // Define the locale text for "Hours"
+                'hour_text'                     => __( 'Hour', 'river' ),
+                // Define the locale text for "Minutes"
+                'minute_text'                   => __( 'Minutes', 'river' ),
+                // Define the locale text for periods
+                'am_pm_text' => array(
+                    'am'                        => __( 'AM', 'river' ),
+                    'pm'                        => __( 'PM', 'river' ),
+                ),
+                
+                /** Position **************************************************/
+                // Corner of the dialog to position, used with the jQuery UI 
+                // Position utility if present.
+                'my_position'                   => 'left top',
+                // Corner of the input to position
+                'at_position'                   => 'left bottom',
+                
+                /** custom hours and minutes **********************************/
+                'hours' => array(
+                    // First displayed hour
+                    'starts'                    => 0,
+                    // Last displayed hour
+                    'ends'                      => 23
+                ),
+                'minutes' => array(
+                    // First displayed minute
+                    'starts'                    => 0,
+                    // Last displayed minute
+                    'ends'                      => 59,
+                    // Interval of displayed minutes
+                    'interval'                  => 1,
+                ),
+                // Number of rows for the input tables, minimum 2, makes more 
+                // sense if you use multiple of 2
+                'rows'                          => 4,
+                // Define if the hours section is displayed or not. 
+                // Set to 0 to get a minute only dialog
+                'show_hours'                    => 'true',
+                // Define if the minutes section is displayed or not. 
+                // Set to 0 to get an hour only dialog
+                'show_minutes'                  => 'true',
+                
+                /** buttons ***************************************************/
+                // shows an OK button to confirm the edit
+                'show_close_button'             => 'false',
+                // Text for the confirmation button (ok button)
+                'close_button_text'             => __( 'Done', 'river' ),
+                // Shows the 'now' button
+                'show_now_button'               => 'false',
+                // Text for the now button
+                'now_button_text'               => __( 'Now', 'river' ),
+                // Shows the deselect time button
+                'show_deselect_button'          => 'false',
+                // Text for the deselect button
+                'deselect_button_text'          => __( 'Deselect', 'river' ),
+            ),
+        ); 
+        
+        if ( ! isset( $field['placeholder'] ) )
+           $field['placeholder'] = '';
+
+        if ( ! isset( $field['class'] ) )
+            $field['class'] = '';
+
+        if ( ! isset( $field['style'] ) )
+            $field['style'] = '';        
+        
+        if ( RIVER_FIELD_TYPE_ERROR == $this->check_keys_structure( $field, $args ) )
+            return RIVER_FIELD_TYPE_ERROR;
+            
+        // Check if default is set and is an integer
+        return is_string( $field['default'] ) ? $field : RIVER_FIELD_TYPE_ERROR;    
+    } 
+    
+   /**
+     * Wysiwyg checker: checks key structure and default value is a string.
+     * 
+     * @uses RIVER_FIELD_TYPE_ERROR
+     * 
+     * @since 0.0.4
+     * 
+     * @param array     $field The field to check
+     * @return str|arr  Returns the $field array if it passes the checks;
+     *                  else returns error message 
+     */    
+    public function f_wysiwyg( $field ) {
+        
+        $args = array(
+            'id'                => '',
+            'title'             => '',
+            'desc'              => '',
+            'default'           => '',
+            'type'              => '',
+            'section_id'        => '',            
+            'sanitizer_filter'  => '',
+            'validator_filter'  => '',
+            'args'  => array(
+                 // use wpautop, default is TRUE
+                'wpautop'       => TRUE,
+                // Whether to display media insert/upload buttons, default is TRUE
+                'media_buttons' => TRUE,
+                // The name assigned to the generated textarea and passed parameter 
+                // when the form is submitted. (may include [] to pass data as array)
+                // default: $editor_id
+                'textarea_name' => '',
+                // The number of rows to display for the textarea
+                'textarea_rows' => get_option('default_post_edit_rows', 10),
+                // The tabindex value used for the form field, default: none
+                'tabindex'      => '',
+                // Additional CSS styling applied for both visual and HTML editors 
+                // buttons, needs to include <style> tags, can use "scoped"
+                'editor_css'    => '',
+                // Any extra CSS Classes to append to the Editor textarea
+                'editor_class'  => '',
+                // Whether to output the minimal editor configuration used 
+                // in PressThis.  default: FALSE
+                'teeny'         => FALSE,
+                // Whether to replace the default fullscreen editor with DFW (needs 
+                // specific DOM elements and css).  default: FALSE
+                'dfw'           => FALSE,
+                // Load TinyMCE, can be used to pass settings directly to TinyMCE 
+                // using an array(). default: TRUE
+                'tinymce'       => TRUE,
+                // Load Quicktags, can be used to pass settings directly to 
+                // Quicktags using an array(). default: TRUE
+                'quicktags'     => TRUE,
+            ),
+        );      
+        
+        if ( RIVER_FIELD_TYPE_ERROR == $this->check_keys_structure( $field, $args ) )
+            return RIVER_FIELD_TYPE_ERROR;
+            
+        // Check if default is set and is an integer
+        return is_string( $field['default'] ) ? $field : RIVER_FIELD_TYPE_ERROR;    
+    }    
     
     /**
      * Check the keys to make sure they match
@@ -519,6 +724,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
                 'timepicker'        => array( $this, 'd_timepicker'     ),
                 'upload-image'      => array( $this, 'd_upload_image'   ),
                 'url'               => array( $this, 'd_text'           ),
+                'wysiwyg'           => array( $this, 'd_wysiwyg'        ),            
         );        
 
         return apply_filters( 'river_available_display_field_type_filters', $default_filters );
@@ -558,7 +764,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Colorpicker field
      * 
-     * @since 0.0.7
+     * @since 0.0.9
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -573,14 +779,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
                 esc_attr( $field['id'] ),
                 isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
                 esc_attr( $name ),
-                esc_attr( $value ) );        
+                esc_attr( $value ) ); 
         
     }
     
     /**
      * Display | Render the Datepicker field
      * 
-     * @since 0.0.4
+     * @since 0.0.9
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -590,7 +796,19 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      */
     public function d_datepicker( $field, $name, $value ) {
         
+        $output = sprintf( '<input id="%1$s" class="datepicker%2$s" type="text" ' .
+                'name="%3$s" value="%4$s" placeholder="%5$s" />',
+                esc_attr( $field['id'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                esc_attr( $name ),                       
+                esc_attr( $value ),                        
+                isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );
 
+        if ( ! empty( $field['desc'] ) )
+            $output .= sprintf( '<br /><span class="description">%s</span>',
+                esc_html( $field['desc'] ) );        
+        
+        return $output;
         
     }   
     
@@ -851,7 +1069,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Timepicker field
      * 
-     * @since 0.0.7
+     * @since 0.0.9
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -860,8 +1078,20 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      *                  passed parameters properly escaped
      */
     public function d_timepicker( $field, $name, $value ) {
-                
 
+        $output = sprintf( '<input id="%1$s" class="timepicker%2$s" type="text" ' .
+                'name="%3$s" value="%4$s" placeholder="%5$s" size="10" />',
+                esc_attr( $field['id'] ),
+                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                esc_attr( $name ),                       
+                esc_attr( $value ),                        
+                isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );      
+        
+        if ( ! empty( $field['desc'] ) )
+            $output .= sprintf( '<br /><span class="description">%s</span>',
+                esc_html( $field['desc'] ) );  
+        
+        return $output;
         
     }
     
@@ -910,7 +1140,35 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
         return $output;
         
-    }     
+    } 
+ 
+    /**
+     * Display | Render the WYSIWYG field
+     * 
+     * @since 0.0.9
+     * 
+     * @param array     $field Field's definition
+     * @param string    $name Field's name name="$name"
+     * @param string    $value Field's value value="$value"
+     * @return string   Formatted string containing the form field with
+     *                  passed parameters properly escaped
+     */
+    public function d_wysiwyg( $field, $name, $value ) {
+        
+        $field['args']['textarea_name'] = $name;
+        
+        $output = wp_editor( 
+                    wp_kses_post( $value ), 
+                    esc_attr( $name ), 
+                    $field['args'] );
+        
+        if ( ! empty( $field['desc'] ) )
+            $output .= sprintf( '<br /><span class="description">%s</span>',
+                esc_html( $field['desc'] ) );        
+        
+        return $output;        
+        
+    }    
     
 } // end of class
 

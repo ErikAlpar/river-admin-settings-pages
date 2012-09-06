@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  River Settings JS
- * @since       0.0.3
+ * @since       0.0.9
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -20,13 +20,15 @@
         
         /**
          * Cache variables passed from wp_localize_script in WordPress
+         * 
+         * @since 0.0.9
          */
-        ajaxURL: "undefined" != typeof riverAdminAjax.ajaxurl && riverAdminAjax.ajaxurl !== null ? riverAdminAjax.ajaxurl : '',
-        resetRequest: "undefined" != typeof riverAdminAjax.resetRequest && riverAdminAjax.resetRequest !== null ? riverAdminAjax.resetRequest : '',
-        formID: "undefined" != typeof riverAdminAjax.formID && riverAdminAjax.formID !== null ? riverAdminAjax.formID : '',
-        settingsGroup: "undefined" != typeof riverAdminAjax.settingsGroup && riverAdminAjax.settingsGroup !== null ? riverAdminAjax.settingsGroup : '',
-        pageID: "undefined" != typeof riverAdminAjax.pageID && riverAdminAjax.pageID !== null ? riverAdminAjax.pageID : '',
-        riverNonce: "undefined" != typeof riverAdminAjax.riverNonce && riverAdminAjax.riverNonce !== null ? riverAdminAjax.riverNonce : '',
+        ajaxURL: riverAdminAjax.ajax_url || '',
+        resetRequest: riverAdminAjax.reset_request || '',
+        formID: riverAdminAjax.form_id || '',
+        settingsGroup: riverAdminAjax.settings_group || '',
+        pageID: riverAdminAjax.page_id || '',
+        riverNonce: riverAdminAjax.river_nonce || '',
 
 	/**
 	 * Scrolling and centering of the popup boxes
@@ -61,13 +63,13 @@
 	/**
 	 * Handles "reset all options" tasks
 	 *
-	 * @since 0.0.5
+	 * @since 0.0.9
 	 *
 	 * @function
 	 */         
         reset: function() {
 
-            if( '' != riverAdminAjax.resetRequest )
+            if( 'true' == riverSettings.resetRequest )
                 riverSettings.resetInit = true;
 
             if ( riverSettings.resetInit ) {
@@ -202,29 +204,24 @@
             
         },
 
-
         /**
          * ready handles checking if riverSettings is ready for use.
          *
-         * @since 0.0.3
+         * @since 0.0.9
          *
          * @function
          */          
         ready: function() {
 
             // If the variables were not passed, pop an error
-            if ( '' == riverSettings.ajaxURL && 
-                '' == riverSettings.resetRequest && 
-                '' == riverSettings.formID && 
-                '' == riverSettings.settingsGroup && 
-                '' == riverSettings.pageID && 
+            if ( '' == riverSettings.ajaxURL || 
+                '' == riverSettings.formID || 
+                '' == riverSettings.settingsGroup ||
+                '' == riverSettings.pageID || 
                 '' == riverSettings.riverNounce ) {
-
-                alert( 'Variables not passed from wp_localize_script to setup AJAX!' );
-
-            // Variables were passed, time to fire this baby up
-            } else {
-
+                alert( 'AJAX parameters were not passed in from wp_localize_script()' );
+                
+             } else {
                 // Cache the variables
                 riverSettings.form = $( 'form#' + riverSettings.formID );
                 riverSettings.resetPopup = $( '#river-popup-reset' );
@@ -236,14 +233,17 @@
                 riverSettings.data;                
 
                 // Bind the functions
-                riverSettings.messageCenter();        
-                riverSettings.reset();
-                riverSettings.submit();                        
-            }            
-        }
+                riverSettings.messageCenter();
+
+                if( '' !== riverSettings.resetRequest )
+                    riverSettings.reset();
+            
+
+                 riverSettings.submit();
+             }
+        }            
+        
     };
-    
-    
     
     /**
      * Launch riverSettings

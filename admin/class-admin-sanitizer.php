@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Sanitizer Class
- * @since       0.0.1
+ * @since       0.0.9
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -79,7 +79,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      * and 'river_default_validator_filters' to let child themes and plugins add
      * their own filters.
      *
-     * @since 0.0.1
+     * @since 0.0.9
      *
      */
     protected function setup_filter_defaults() {
@@ -91,10 +91,11 @@ abstract class River_Admin_Sanitizer extends River_Admin {
                     'no_html'           => array(
                         'heading', 'text', 'upload', 'textarea', 'select', 'radio', 
                         'multicheck', 'upload-image', 'email', 'url', 'imgselect',
-                        'colorpicker'
+                        'colorpicker', 'datepicker', 'timepicker'
                     ),
                     'safe_html'         => array(), 
                     'unfiltered_html'   => array(),
+                    'wp_kses'           => array( 'wysiwyg' ),
                 )
         );
         
@@ -109,7 +110,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
                     'hex'               => array( 'colorpicker' ),
                     'integer'           => array(),
                     'numeric'           => array(),
-                    'string'            => array( 'text', 'textarea' ),
+                    'string'            => array( 'text', 'textarea', 'wysiwyg' ),
                     'string_choices'    => array( 'imgselect', 'multicheck', 'radio', 'select' ),
                     'url'               => array( 'upload-image', 'url' ),
                     'zero_one'          => array( 'checkbox', 'button' ),
@@ -346,6 +347,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
                 'zero_one'                 => array( $this, 'zero_one'                  ),
                 'no_html'                  => array( $this, 'no_html'                   ),
                 'safe_html'                => array( $this, 'safe_html'                 ),
+                'wp_kses'                  => array( $this, 'river_wp_kses'             ),
                 'requires_unfiltered_html' => array( $this, 'requires_unfiltered_html'  ),
         );
 
@@ -481,6 +483,22 @@ abstract class River_Admin_Sanitizer extends River_Admin {
         }
 
     }
+    
+    /**
+     * Filters content through WordPress' core function wp_kses_post
+     * 
+     * @since 0.0.9
+     *
+     * @param string    $new_value New value
+     * @param string    $old_value Current value in the options database
+     * @return string   Returns filtered content for allowed HTML tags for post content
+     * @link http://codex.wordpress.org/Function_Reference/wp_kses_post
+     */
+    function river_wp_kses( $new_value ) {
+
+        return wp_kses_post( $new_value );
+
+    }    
     
 
     /** Validator Filter Methods **********************************************/
@@ -665,7 +683,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      *                  value; else returns the old value 
      */     
     function v_string( $new_value, $old_value ) {
-        
+
         return is_string( $new_value ) ? trim( $new_value ) : $old_value;
         
     }

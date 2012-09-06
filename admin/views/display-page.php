@@ -6,21 +6,12 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Page Class
- * @since       0.0.1
+ * @since       0.0.7
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
  * 
  */
-
-
-
-if ( isset( $this->form['site_url'] ) ) {
-    $site_url = $this->form['site_url'];
-} else {
-    $site_url = '';
-}
-
 ?>
 <div id="river-container" class="wrap">
     

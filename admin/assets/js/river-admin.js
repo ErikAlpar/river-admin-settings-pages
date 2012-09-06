@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  River Admin JS
- * @since       0.0.3
+ * @since       0.0.9
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -17,6 +17,8 @@
     riverAdmin = {
         
         name: 'riverAdmin',
+        
+        timePickers: riverAdminParams.timepicker || '',
 
 	/**
 	 * Tasks on page load
@@ -146,7 +148,20 @@
 	 */
 	confirm: function (text) {
 		return confirm(text) ? true : false;
-	},       
+	},
+        
+	/**
+	 * datepicker handler
+	 *
+	 * @since 0.0.9
+	 *
+	 * @function
+	 */        
+        datepickerHandler: function() {
+            
+            riverAdmin.container.find( 'input[type=text].datepicker').datepicker();
+            
+        },
 
 	/**
 	 * imgselect handler
@@ -172,6 +187,112 @@
 
         },
         
+	/**
+	 * timepicker handler
+	 *
+	 * @since 0.0.9
+         * 
+         * @uses riverAdmin.timePickers array passed in from wp_localize_script()
+	 *
+	 * @function
+         * @link http://fgelinas.com/code/timepicker/
+         * @link https://github.com/fgelinas/timepicker
+	 */        
+        timepickerHandler: function() {
+            
+            // Check to make sure the array got passed in from the caller
+            if ( ! $.isArray( riverAdmin.timePickers ) )
+                return;
+            
+            // For each timepicker, attach the .timepicker() script and define
+            // its parameters (which are in the passed in array).
+            riverAdmin.container.find( 'input[type=text].timepicker').each(function(i) {
+                $(this).timepicker({
+                    
+                    /** Options ***************************************************/
+                    // The character to use to separate hours and minutes. (default: ':')
+                    timeSeparator: riverAdmin.timePickers[i]['args']['time_separator'],
+                    // Define whether or not to show a leading zero for hours < 10. (default: true)
+                    showLeadingZero: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_leading_zero'] ),
+                    // Define whether or not to show a leading zero for minutes < 10. (default: true)
+                    showMinutesLeadingZero: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_minutes_leading_zero'] ),
+                    // Define whether or not to show AM/PM with selected time. (default: false)
+                    showPeriod: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_period'] ),
+                    // Define if the AM/PM labels on the left are displayed. (default: true)
+                    showPeriodLabels: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_period_labels'] ),
+                    // The character to use to separate the time from the time period.
+                    periodSeparator: riverAdmin.timePickers[i]['args']['period_separator'],
+                    // Define an alternate input to parse selected time to
+                    altField: riverAdmin.timePickers[i]['args']['alt_field'],
+                    // Used as default time when input field is empty or for inline timePicker
+                    // (set to 'now' for the current time, '' for no highlighted time,
+                    // default value: now)
+                    defaultTime: riverAdmin.timePickers[i]['args']['default_time'],         
+
+                    /** trigger options *******************************************/
+                    // Define when the timepicker is shown.
+                    // 'focus': when the input gets focus, 'button' when the button trigger element is clicked,
+                    // 'both': when the input gets focus and when the button is clicked.
+                    showOn: riverAdmin.timePickers[i]['args']['show_on'], 
+                    // jQuery selector that acts as button trigger. ex: '#trigger_button'
+                    button: 'null' == riverAdmin.timePickers[i]['args']['button'] ? null : riverAdmin.timePickers[i]['args']['button'],
+                    
+                    /** Localization **********************************************/
+                    // Define the locale text for "Hours"
+                    hourText: riverAdmin.timePickers[i]['args']['hour_text'], 
+                    // Define the locale text for "Minute"
+                    minuteText: riverAdmin.timePickers[i]['args']['minute_text'],
+                    // Define the locale text for periods
+                    amPmText: [riverAdmin.timePickers[i]['args']['am_pm_text']['am'], riverAdmin.timePickers[i]['args']['am_pm_text']['pm'] ],
+
+                    /** Position **************************************************/
+                    // Corner of the dialog to position, used with the jQuery UI Position utility if present.
+                    myPosition: riverAdmin.timePickers[i]['args']['my_position'],
+                    // Corner of the input to position
+                    atPosition: riverAdmin.timePickers[i]['args']['at_position'],
+
+                    /** custom hours and minutes **********************************/
+                    hours: {
+                        // First displayed hour
+                        starts: riverAdmin.timePickers[i]['args']['hours']['starts'],
+                        // Last displayed hour
+                        ends: riverAdmin.timePickers[i]['args']['hours']['ends']
+                    },
+                    minutes: {
+                        // First displayed minute
+                        starts: riverAdmin.timePickers[i]['args']['minutes']['starts'],
+                        // Last displayed minute
+                        ends: riverAdmin.timePickers[i]['args']['minutes']['endss'],
+                        // Interval of displayed minutes
+                        interval: riverAdmin.timePickers[i]['args']['minutes']['interval']                       
+                    },
+                    // Number of rows for the input tables, minimum 2, makes more 
+                    // sense if you use multiple of 2
+                    rows: riverAdmin.timePickers[i]['args']['rows'],                   
+                    // Define if the hours section is displayed or not. Set to 
+                    // false to get a minute only dialog
+                    showHours: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_hours'] ),                
+                    // Define if the minutes section is displayed or not. Set to 
+                    // false to get an hour only dialog
+                    showMinutes: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_minutes'] ),
+
+                    /** buttons ***************************************************/
+                    // shows an OK button to confirm the edit
+                    showCloseButton: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_close_button'] ),
+                    // Text for the confirmation button (ok button)
+                    closeButtonText: riverAdmin.timePickers[i]['args']['close_button_text'],
+                    // Shows the 'now' button
+                    showNowButton: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_now_button'] ),
+                    // Text for the now button
+                    nowButtonText: riverAdmin.timePickers[i]['args']['now_button_text'],
+                    // Text for the now button
+                    showDeselectButton: riverAdmin.convertToBoolean( riverAdmin.timePickers[i]['args']['show_deselect_button'] ),
+                    // Text for the deselect button 
+                    deselectButtonText: riverAdmin.timePickers[i]['args']['deselect_button_text']
+                });
+            });           
+            
+        },        
         
 	/**
 	 * upload-image handler
@@ -199,7 +320,7 @@
              * then change the <img> src to the new URL
              */
             window.send_to_editor = function( html ) {
-
+                
                 imgurl = $('img', html).attr('src');
                 $(targetfield)
                     .val(imgurl)
@@ -235,6 +356,26 @@
             });
         },
         
+        
+	/**
+	 * Convert the string parameter to Boolean
+	 *
+	 * @since 0.0.9
+	 *
+	 * @function
+         * @param   string  String to convert
+         * @return  bool    TRUE or FALSE
+	 */ 
+        convertToBoolean: function( stringToConvert ) {
+               
+            if( 'true' === stringToConvert || '1' === stringToConvert ) {
+                return true;
+            } else {
+                return false;
+            }
+
+
+        },
         
 	/**
 	 * When a input or textarea field field is updated, update the character counter.
@@ -337,7 +478,9 @@
             
             riverAdmin.pageLoad();
             riverAdmin.navSectionHandler();
-            riverAdmin.imgselectHandler(); 
+            riverAdmin.datepickerHandler();
+            riverAdmin.imgselectHandler();
+            riverAdmin.timepickerHandler();
             riverAdmin.uploadImageHandler();
             
             riverAdmin.updateCharacterCount();
@@ -345,8 +488,6 @@
         }
 
     };
-   
-        
     
     /**
      * Launch river
@@ -371,5 +512,4 @@
  */
 function river_confirm(text) {
         return riverAdmin.confirm(text);
-} 
-
+}

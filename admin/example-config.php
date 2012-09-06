@@ -161,6 +161,39 @@
         'style'             => '',
     );
     
+/** datepicker ****************************************************************/   
+   
+   // Example 'datepicker' for a HTML text field with a jQuery UI datepicker widget
+    $config['default_fields']['example_datepicker'] = array(
+        // settings ID for settings array & HTML element
+        'id'                => 'example_datepicker',
+        // element's label
+        'title'             => __( 'Example datepicker Input', 'river' ),
+        // (opt) description displayed under the element
+        'desc'              => __( 'This is a description for the datepicker input.', 'river' ),
+        // default value
+        'default'           => '',        
+        // HTML field type
+        'type'              => 'datepicker',        
+        // section these are assigned to
+        'section_id'        => 'section1',
+        
+        /** These are the Optional Arguments & do not have to be included *****/
+        
+        // (opt) add a custom class to the HTML element
+        'class'             => '',
+        // (opt) Sets a placeholder in the form's text field
+        'placeholder'       => '',
+        // (opt) Specify the sanitization filter here; else it's set
+        // automatically in the Settings Sanitizer Class
+        'sanitizer_filter'  => 'no_html',
+        // (opt) Specify the validation filter here; else it's set
+        // automatically in the Settings Sanitizer Class        
+        'validator_filter'  => 'datetime_format',
+        // (opt) sets an inline style
+        'style'             => '',
+    );    
+    
 /** email *********************************************************************/    
     // Example 'email' for a HTML text field
     $config['default_fields']['example_email'] = array(
@@ -488,7 +521,7 @@
         // section these are assigned to
         'section_id'        => 'section1',
         
-        /** These are the Optional Arguments & do not have to be included *****/        
+        /** These are the Optional Arguments & do not have to be included *****/ 
         
         // (opt) add a custom class to the HTML element
         'class'             => '',
@@ -502,7 +535,115 @@
         'validator_filter'  => 'string',
         // (opt) sets an inline style
         'style'             => '',
-    );    
+        
+    ); 
+    
+/** timepicker ****************************************************************/   
+   
+   // Example 'timepicker' for a HTML text field with a jQuery timePicker widget
+    $config['default_fields']['example_timepicker'] = array(
+        // settings ID for settings array & HTML element
+        'id'                => 'example_timepicker',
+        // element's label
+        'title'             => __( 'Example Time Picker', 'river' ),
+        // (opt) description displayed under the element
+        'desc'              => __( 'Click to select a time.', 'river' ),
+        // default value
+        'default'           => '', 
+        // HTML field type
+        'type'              => 'timepicker',        
+        // section these are assigned to
+        'section_id'        => '',
+        // timepicker configuration parameters
+        'args'  => array(
+            /** Options ***************************************************/
+
+            // The character to use to separate hours and minutes. (default: ':')
+            'time_separator'                => ':',
+            //Define whether or not to show a leading zero for hours < 10. (default: true)
+            'show_leading_zero'             => 'true',
+            // Define whether or not to show a leading zero for minutes < 10. (default: true)
+            'show_minutes_leading_zero'     => 'true',
+            // Define whether or not to show AM/PM with selected time. (default: false)
+            'show_period'                   => 'true',
+            // Define if the AM/PM labels on the left are displayed. (default: true)
+            'show_period_labels'            => 'true',
+            // The character to use to separate the time from the time period.
+            'period_separator'              => ' ',
+            // Define an alternate input to parse selected time to
+            'alt_field'                     => '#alternate_input',
+            // Used as default time when input field is empty or for inline timePicker
+            // (set to 'now' for the current time, '' for no highlighted time,
+            // default value: 'now')
+            'default_time'                  => 'now',
+
+            /** trigger options *******************************************/
+            // Define when the timepicker is shown.
+            // 'focus': when the input gets focus, 'button' when the button trigger element is clicked,
+            // 'both': when the input gets focus and when the button is clicked.
+            'show_on'                       => 'focus',
+            // jQuery selector that acts as button trigger. ex: '#trigger_button'
+            'button'                        => 'null',
+
+            /** Localization **********************************************/
+            // Define the locale text for "Hours"
+            'hour_text'                     => __( 'Hour', 'river' ),
+            // Define the locale text for "Minutes"
+            'minute_text'                   => __( 'Minutes', 'river' ),
+            // Define the locale text for periods
+            'am_pm_text' => array(
+                'am'                        => __( 'AM', 'river' ),
+                'pm'                        => __( 'PM', 'river' ),
+            ),
+
+            /** Position **************************************************/
+            // Corner of the dialog to position, used with the jQuery UI 
+            // Position utility if present.
+            'my_position'                   => 'left top',
+            // Corner of the input to position
+            'at_position'                   => 'left bottom',
+
+            /** custom hours and minutes **********************************/
+            'hours' => array(
+                // First hour to display
+                'starts'                    => 6,
+                // Last hour to display
+                'ends'                      => 17
+            ),
+            'minutes' => array(
+                // First minute to display
+                'starts'                    => 0,
+                // Last minute to display
+                'ends'                      => 59,
+                // Interval of displayed minutes. 1 = display every minute.
+                // 5 = display every 6 minutes.
+                'interval'                  => 1,
+            ),
+            // Number of rows for the input tables, minimum 2, makes more 
+            // sense if you use multiple of 2
+            'rows'                          => 4,
+            // Define if the hours section is displayed or not. 
+            // Set to 0 to get a minute only dialog
+            'show_hours'                    => 'true',
+            // Define if the minutes section is displayed or not. 
+            // Set to 0 to get an hour only dialog
+            'show_minutes'                  => 'true',
+
+            /** buttons ***************************************************/
+            // shows an OK button to confirm the edit
+            'show_close_button'             => 'true',
+            // Text for the confirmation button (ok button)
+            'close_button_text'             => __( 'Done', 'river' ),
+            // Shows the 'now' button
+            'show_now_button'               => 'true',
+            // Text for the now button
+            'now_button_text'               => __( 'Select Current Time', 'river' ),
+            // Shows the deselect time button
+            'show_deselect_button'          => 'true',
+            // Text for the deselect button
+            'deselect_button_text'          => __( 'Deselect All', 'river' ),
+        ),
+    );      
     
 /** upload-image **************************************************************/    
     // Example 'upload-image' for a HTML text field + image previewer
@@ -569,4 +710,63 @@
         // (opt) sets an inline style
         'style'             => '',
     );    
-     
+  
+/** wysiwyg *******************************************************************/   
+   
+   // Example 'wysiwyg', which is the WordPress visual editor (i.e. TinyMCE)
+    $config['default_fields']['example_wysiwyg'] = array(
+        // settings ID for settings array & HTML element
+        'id'                => 'example_wysiwyg',
+        // element's label
+        'title'             => __( 'Example Text Input', 'river' ),
+        // (opt) description displayed under the element
+        'desc'              => __( 'This is a description for the text input.', 'river' ),
+        // default value
+        'default'           => '',        
+        // HTML field type
+        'type'              => 'wysiwyg',        
+        // section these are assigned to
+        'section_id'        => 'section1',
+        // options array
+        // @link http://codex.wordpress.org/Function_Reference/wp_editor
+        'args'  => array(
+            // use wpautop, default is TRUE
+            'wpautop'       => TRUE,
+            // Whether to display media insert/upload buttons, default is TRUE
+	    'media_buttons' => TRUE,
+            // The name assigned to the generated textarea and passed parameter 
+            // when the form is submitted. (may include [] to pass data as array)
+            // default: $editor_id
+	    'textarea_name' => $editor_id,
+            // The number of rows to display for the textarea
+	    'textarea_rows' => get_option('default_post_edit_rows', 10),
+            // The tabindex value used for the form field, default: none
+	    'tabindex'      => '',
+            // Additional CSS styling applied for both visual and HTML editors 
+            // buttons, needs to include <style> tags, can use "scoped"
+	    'editor_css'    => '',
+            // Any extra CSS Classes to append to the Editor textarea
+	    'editor_class'  => '',
+            // Whether to output the minimal editor configuration used 
+            // in PressThis.  default: FALSE
+	    'teeny'         => FALSE,
+            // Whether to replace the default fullscreen editor with DFW (needs 
+            // specific DOM elements and css).  default: FALSE
+	    'dfw'           => FALSE,
+            // Load TinyMCE, can be used to pass settings directly to TinyMCE 
+            // using an array(). default: TRUE
+	    'tinymce'       => TRUE,
+            // Load Quicktags, can be used to pass settings directly to 
+            // Quicktags using an array(). default: TRUE
+	    'quicktags'     => TRUE,
+        ),
+
+        /** These are the Optional Arguments & do not have to be included *****/
+
+        // (opt) Specify the sanitization filter here; else it's set
+        // automatically in the Settings Sanitizer Class
+        'sanitizer_filter'  => 'unfiltered_html',
+        // (opt) Specify the validation filter here; else it's set
+        // automatically in the Settings Sanitizer Class        
+        'validator_filter'  => 'string',
+    );    
