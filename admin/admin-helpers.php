@@ -89,3 +89,4 @@ function river_is_menu_page( $pagehook = '' ) {
     return false;
 
 }
+

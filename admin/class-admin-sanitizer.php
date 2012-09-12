@@ -79,7 +79,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      * and 'river_default_validator_filters' to let child themes and plugins add
      * their own filters.
      *
-     * @since 0.0.9
+     * @since 0.0.10
      *
      */
     protected function setup_filter_defaults() {
@@ -89,7 +89,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
                 array( 
                     'zero_one'          => array( 'checkbox', 'button' ), 
                     'no_html'           => array(
-                        'heading', 'text', 'upload', 'textarea', 'select', 'radio', 
+                        'text', 'upload', 'textarea', 'select', 'radio', 
                         'multicheck', 'upload-image', 'email', 'url', 'imgselect',
                         'colorpicker', 'datepicker', 'timepicker'
                     ),
@@ -693,7 +693,7 @@ abstract class River_Admin_Sanitizer extends River_Admin {
      * Choices validation - validating the new value is in the default settings'
      * choices for this option.
      * 
-     * @since 0.0.3
+     * @since 0.0.10
      * 
      * @param string    $new_value New value to validate
      * @param string    $old_value Current value in options database
@@ -708,9 +708,11 @@ abstract class River_Admin_Sanitizer extends River_Admin {
         
         if( ! is_string( $new_value) )
             return $old_value;
-        
-        if ( empty ( $new_value ) )
+        $stop = false;
+        if ( '' == $new_value ) {
+            $stop = true;
             return $new_value;
+        }
         
         return array_key_exists( $option_key, $this->default_fields[$id]['choices'] ) ? 
                 $new_value : $old_value;

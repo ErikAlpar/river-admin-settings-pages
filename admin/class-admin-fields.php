@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Fields Class
- * @since       0.0.9
+ * @since       0.0.11
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -20,7 +20,7 @@ if ( !class_exists( 'River_Admin_Fields' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.9
+ * @since       0.0.11
  */
 abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     
@@ -265,7 +265,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      * 
      * @uses RIVER_FIELD_TYPE_ERROR
      * 
-     * @since 0.0.4
+     * @since 0.0.10
      * 
      * @param array     $field The field to check
      * @return str|arr  Returns the $field array if it passes the checks;
@@ -277,6 +277,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $args = array(
             // field's ID for field's array & HTML element
             'id'                => '',
+            'title'             => '',
             // This is the text between the <h4> tags
             'desc'              => '',      
             // HTML field type
@@ -600,7 +601,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      * 
      * @uses RIVER_FIELD_TYPE_ERROR
      * 
-     * @since 0.0.4
+     * @since 0.0.10
      * 
      * @param mixed     $default Default field to check
      * @param array     $choices array of choices
@@ -630,8 +631,11 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
                     foreach( $default as $skey => $svalue ) {
                         if ( ! array_key_exists( $skey, $choices ) )
-                                return RIVER_FIELD_TYPE_ERROR;
+                            return RIVER_FIELD_TYPE_ERROR;
                     }
+                // if equal to '', then return it
+                } elseif ( '' === $default ) {
+                    return $default;
                 } else {
                     return RIVER_FIELD_TYPE_ERROR;
                 }               
@@ -736,7 +740,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Checkbox field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -749,13 +753,13 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $output = sprintf( '<input id="%1$s" class="checkbox%2$s" type="checkbox" ' .
                 'name="%3$s" value="1" %4$s />',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),
                 checked( $value, 1, false ) );
 
         $output .= sprintf( '<label for="%1$s">%2$s</label>',
                 esc_attr( $field['id'] ),
-                esc_html( $field['desc'] ) ); 
+                wp_kses_post( $field['desc'] ) ); 
             
         return $output;
         
@@ -764,7 +768,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Colorpicker field
      * 
-     * @since 0.0.9
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -777,7 +781,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         return sprintf( '<input id="%1$s" class="color%2$s" name="%3$s" ' .
                 'value="%4$s" />', 
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),
                 esc_attr( $value ) ); 
         
@@ -786,7 +790,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Datepicker field
      * 
-     * @since 0.0.9
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -799,14 +803,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $output = sprintf( '<input id="%1$s" class="datepicker%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" placeholder="%5$s" />',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ),                        
                 isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
         
         return $output;
         
@@ -815,7 +819,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Heading field within <h4> tag
      * 
-     * @since 0.0.4
+     * @since 0.0.10
      * 
      * @param array     $field Field's definition
      * @return string   Formatted string containing the form field with
@@ -824,14 +828,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     public function d_heading( $field ) {
 
         return sprintf ( '<h4 class="heading">%s</h4>',
-                    esc_html( $field['desc'] ) );
+                    wp_kses_post( $field['desc'] ) );
         
     }
     
     /**
      * Display | Render the imgselect field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -852,7 +856,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s" class="radio%2$s" type="radio" ' .
                     'name="%3$s" value="%1$s" %4$s /><br>',
                     esc_attr( $key ),
-                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                    isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                     esc_attr( $name ),
                     checked( $value, $key, false ) );
 
@@ -871,7 +875,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         
         if ( ! empty( $field['desc'] ) )
             $output .=sprintf( '<br /><span class="description">%s</span>',
-                        esc_html( $field['desc'] ) ); 
+                        wp_kses_post( $field['desc'] ) ); 
             
         return $output;
         
@@ -880,7 +884,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Multicheck field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -906,7 +910,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s%6$s" class="multicheck%2$s" type="checkbox" ' .
                     'name="%3$s[%4$s]" value="%4$s" %5$s data-key="%1$s"/>',
                     esc_attr( $field['id'] ),
-                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                    isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                     esc_attr( $name ),
                     esc_attr ( $key ),
                     isset( $is_checked ) ? 'checked="checked"' : '',
@@ -914,7 +918,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
             $output .= sprintf( '<label for="%1$s">%2$s</label>',
                     esc_attr( $field['id'] . $i ),
-                    esc_html( $choice['value'] ) );
+                    wp_kses_post( $choice['value'] ) );
 
             $output .= '</li>';
             $i++;
@@ -923,7 +927,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
             
         return $output;
         
@@ -932,7 +936,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Radio field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -950,7 +954,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             $output .= sprintf( '<input id="%1$s%6$s" class="radio%2$s" type="radio" ' .
                     'name="%3$s" value="%4$s" %5$s />',
                     esc_attr( $field['id'] ),
-                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                    isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                     esc_attr( $name ),
                     esc_attr ( $key ),
                     checked( $value, $key, false ),
@@ -958,7 +962,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
             $output .= sprintf( '<label for="%1$s">%2$s</label>',
                     esc_attr( $field['id'] . $i ),
-                    esc_html( $choice['value'] ) );
+                    wp_kses_post( $choice['value'] ) );
 
             $output .= '</li>';
             $i++;
@@ -967,7 +971,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
             
         return $output;
     }
@@ -975,7 +979,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Select field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -986,7 +990,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     public function d_select( $field, $name, $value ) {
 
         $output = sprintf ( '<select class="select%1$s" name="%2$s">',
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ) );
 
         // Now load up each of the other <options> in 'choices'
@@ -1003,7 +1007,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );       
+                wp_kses_post( $field['desc'] ) );       
         
         return $output;
     }
@@ -1011,7 +1015,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Text field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -1024,14 +1028,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $output = sprintf( '<input id="%1$s" class="regular-text%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" placeholder="%5$s" />',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ),                        
                 isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
         
         return $output;
     }
@@ -1039,7 +1043,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Textarea field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -1049,18 +1053,19 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
      */
     public function d_textarea( $field, $name, $value ) {
         
+        
         $output = sprintf( '<textarea id="%1$s" class="textarea%2$s" ' .
-                'name="%3$s" placeholder="%4$s"  rows="5" cols="30">' .
+                'name="%3$s" placeholder="%4$s" rows="5" cols="30">' .
                 '%5$s</textarea>',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),
                 isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '',
-                esc_attr( $value ) );
+                esc_textarea( $value ) );
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
         
         return $output;
     } 
@@ -1069,7 +1074,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the Timepicker field
      * 
-     * @since 0.0.9
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -1082,14 +1087,14 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $output = sprintf( '<input id="%1$s" class="timepicker%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" placeholder="%5$s" size="10" />',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ),                        
                 isset( $field['placeholder'] ) ? esc_attr( $field['placeholder'] ) : '' );      
         
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );  
+                wp_kses_post( $field['desc'] ) );  
         
         return $output;
         
@@ -1098,7 +1103,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the image-uploader field
      * 
-     * @since 0.0.7
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -1111,7 +1116,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         $output = sprintf( '<input id="%1$s" class="upload-url%2$s" type="text" ' .
                 'name="%3$s" value="%4$s" />',
                 esc_attr( $field['id'] ),
-                isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                 esc_attr( $name ),                       
                 esc_attr( $value ) );                        
 
@@ -1123,7 +1128,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
 
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );
+                wp_kses_post( $field['desc'] ) );
 
         $output .= sprintf ( '<div id="image-preview" style="%s">' ,
                 empty( $value ) ? 'display: none;' : 'display:block' );
@@ -1131,7 +1136,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
             // Display the image tag
             $output .= sprintf( '<img id="%1$s" class="upload-url%2$s" src="%3$s" />',
                     esc_attr( $field['id'] ),
-                    isset( $field['class'] ) ? esc_attr( " {$field['class']}" ) : '',
+                    isset( $field['class'] ) ? ' ' . esc_attr( sanitize_html_class( $field['class'] ) ) : '',
                     esc_attr( $value ) );
             // Delete image
             $output .= '<a class="delete-image button" href="#">Remove Image</a>';
@@ -1145,7 +1150,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
     /**
      * Display | Render the WYSIWYG field
      * 
-     * @since 0.0.9
+     * @since 0.0.11
      * 
      * @param array     $field Field's definition
      * @param string    $name Field's name name="$name"
@@ -1164,7 +1169,7 @@ abstract class River_Admin_Fields extends River_Admin_Sanitizer {
         
         if ( ! empty( $field['desc'] ) )
             $output .= sprintf( '<br /><span class="description">%s</span>',
-                esc_html( $field['desc'] ) );        
+                wp_kses_post( $field['desc'] ) );        
         
         return $output;        
         

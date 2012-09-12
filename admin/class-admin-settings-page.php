@@ -6,7 +6,7 @@
  * @category    River 
  * @package     Framework Admin
  * @subpackage  Admin Page Class
- * @since       0.0.9
+ * @since       0.0.11
  * @author      CodeRiver Labs 
  * @license     http://www.opensource.org/licenses/gpl-license.php GPL v2.0 (or later)
  * @link        http://coderiverlabs.com/
@@ -21,7 +21,7 @@ if ( !class_exists( 'River_Admin_Settings_Page' ) ) :
  * @category    River
  * @package     Framework Admin
  *
- * @since       0.0.9
+ * @since       0.0.11
  * 
  * @link    http://codex.wordpress.org/Settings_API
  */
@@ -49,10 +49,11 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Available Setting Page Types
      * 
-     * @since 0.0.4
+     * @since 0.0.11
      * @var array 
      */
-    protected $available_page_types = array( 'main_page', 'sub_page', 'theme_page' );    
+    protected $available_page_types = array( 'main_page', 'sub_page', 
+        'theme_page', 'sub_nonsettings_page' );    
  
     
     /** Constructor & Destructor **********************************************/
@@ -106,7 +107,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
                     $config['page']['first_submenu'], 
                     $this->config_default_page['first_submenu'] );             
 
-        } elseif ( ( 'sub_page' == $this->page_type ) && 
+        } elseif ( ( 'sub_page' == $this->page_type || 'sub_nonsettings_page' == $this->page_type ) && 
                 isset( $config['page']['submenu'] ) && is_array( $config['page']['submenu'] ) ) {
 
             $this->page['submenu'] = wp_parse_args(
@@ -121,58 +122,68 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
                     $this->config_default_page['theme'] );   
         }       
 
-        
         $this->sections = isset( $config['sections'] ) && is_array( $config['sections'] ) ? 
                 $config['sections'] : '';
-        
-        // Return if there's no form, settings group, or page type
-        if( ! $this->form || ! $this->page || ! $this->sections )
-            return;                   
-        
-        if( isset( $config[ 'default_fields' ] ) && is_array( $config[ 'default_fields' ] ) ) {
-            
-            $this->add_field_checker_filter();
-            
-            $default_fields = array();
-            $defaults = array();
-            
-            foreach( $config[ 'default_fields' ] as $key => $setting ) {
-                
-                // Check that the setting type in the config file for this option
-                // is in the available_field_types array.  If no, skip this one.
-                if( ! array_key_exists( $setting['type'], 
-                        $this->get_available_field_types_filters() ) )
-                    return;
-                
-                $setting['sanitizer_filter'] = $this->get_field_sanitizer_filter( $setting );
-                $setting['validator_filter'] = $this->get_field_validator_filter( $setting );
-                if( ! $setting['sanitizer_filter'] || ! $setting['validator_filter'] )                    
-                    return;
-                
-                $response = 
-                    apply_filters( "river_field_checker_{$this->settings_group}", $setting );
-                    
-                if ( RIVER_FIELD_TYPE_ERROR == $response )                   
-                    return;                    
-                    
-                $default_fields[$key] = $response;
-                
-                if ( 'heading' != $setting['type']  )
-                    $defaults[$key] = $setting['default'];
-                
-                if ( 'timepicker' == $setting['type']  )
-                    $this->timepickers[] = $setting;                
-                
-            }
-           
-            $this->default_fields = isset( $default_fields ) & is_array( $default_fields ) && ! empty( $default_fields ) ? $default_fields : '';
-            $this->defaults = isset( $defaults ) & is_array( $defaults ) && ! empty( $defaults ) ? $defaults : '';                        
-        }
 
-        // Return if there's no default_fields or defaults
-        if( ! $this->default_fields || ! $this->defaults )
-            return;
-        
+        if( 'sub_nonsettings_page' != $this->page_type ) {
+            
+            // Return if there's no form, settings group, or page type
+            if( ! $this->form || ! $this->page || ! $this->sections )
+                return;             
+            
+            if( isset( $config[ 'default_fields' ] ) && is_array( $config[ 'default_fields' ] ) ) {
+
+                $this->add_field_checker_filter();
+
+                $default_fields = array();
+                $defaults = array();
+
+                foreach( $config[ 'default_fields' ] as $key => $setting ) {
+
+                    // Check that the setting type in the config file for this option
+                    // is in the available_field_types array.  If no, skip this one.
+                    if( ! array_key_exists( $setting['type'], 
+                            $this->get_available_field_types_filters() ) )
+                        return;
+
+                    if ( 'heading' != $setting['type']  ) {                
+                        $setting['sanitizer_filter'] = $this->get_field_sanitizer_filter( $setting );
+                        $setting['validator_filter'] = $this->get_field_validator_filter( $setting );
+                        if( ! $setting['sanitizer_filter'] || ! $setting['validator_filter'] )                    
+                            return;
+                    }
+
+                    $response = 
+                        apply_filters( "river_field_checker_{$this->settings_group}", $setting );
+
+                    if ( RIVER_FIELD_TYPE_ERROR == $response )                   
+                        return;                    
+
+                    $default_fields[$key] = $response;
+
+                    if ( 'heading' != $setting['type']  )
+                        $defaults[$key] = $setting['default'];
+
+                    if ( 'timepicker' == $setting['type']  )
+                        $this->timepickers[] = $setting;                
+
+                }
+
+                $this->default_fields = isset( $default_fields ) & is_array( $default_fields ) && ! empty( $default_fields ) ? $default_fields : '';
+                $this->defaults = isset( $defaults ) & is_array( $defaults ) && ! empty( $defaults ) ? $defaults : '';                        
+             
+            }
+
+            // Return if there's no default_fields or defaults
+            if( ! $this->default_fields || ! $this->defaults )
+                return;
+        } else {
+                
+            // Return if there's no form, settings group, or page type
+            if( ! $this->form || ! $this->page )
+                return; 
+            
+        }
         $this->hooks();
     }
     
@@ -186,7 +197,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * @uses    add_action()
      * @uses    'admin_menu' hook
      */
-    private function hooks() {
+    protected function hooks() {
         add_action( 'admin_menu',   array( &$this, 'page_request_handling' ), 10 );
         
         // Add the settings page
@@ -195,12 +206,12 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
         add_action( 'admin_menu',   array( &$this, 'maybe_add_submenu' ) );      
         add_action( 'admin_menu',   array( &$this, 'maybe_add_theme_page' ) ); 
 
-        
         // Register the setting - ASSUMES ONE PER PAGE
         add_action( 'admin_init',   array( &$this, 'register_setting' ) ); 
         add_action( 'admin_init',   array( $this, 'uploader_setup' ) );
-        
-        add_action( "wp_ajax_river_{$this->settings_group}", array( &$this, 'ajax_save_callback' ) );                   
+
+        add_action( "wp_ajax_river_{$this->settings_group}", 
+                array( &$this, 'ajax_save_callback' ) );                   
                
     }
     
@@ -313,7 +324,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Adds a Submenu Settings Page to the Parent Settings Menu
      * 
-     * @since   0.0.0
+     * @since   0.0.10
      * 
      * @uses    add_submenu_page()
      * @link    http://codex.wordpress.org/Function_Reference/add_submenu_page
@@ -321,7 +332,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     public function maybe_add_submenu() {
   
             
-        if ( ( 'sub_page' == $this->page_type ) && 
+        if ( ( 'sub_page' == $this->page_type || 'sub_nonsettings_page' == $this->page_type ) && 
                 isset( $this->page['submenu'] ) && 
                 is_array( $this->page['submenu'] ) ) {  
             
@@ -556,7 +567,7 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
      * @since   0.0.3
      * 
      */
-    abstract public function display_section_callback();
+    abstract public function display_section_callback( $section );
 
     /**
      * Display the setting option on its section and page
@@ -595,7 +606,6 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
             if ( function_exists( 'check_ajax_referer' ) )
                 check_ajax_referer( $settings_group . '-options-update', '_ajax_nonce' );
  
-
             $response = $this->save( $settings_group );
         }
         
@@ -724,14 +734,6 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
             // Get the current options db values
             $options = get_option( $settings_group );                
 
-            // Compare $new_value keys against the defaults.  If there are
-            // differences, something is wrong. Just return & report the error.
-            $key_diff = array_diff_key( $new_value, $options );
-            if ( $key_diff ) {
-                die( $response );
-                return;
-            }
-
             // If the new values are identical to the current options db
             // no need to save.
             if ( $new_value === $options ) {
@@ -816,17 +818,15 @@ abstract class River_Admin_Settings_Page extends River_Admin_Fields {
     /**
      * Enqueue the Style files
      * 
-     * @since   0.0.9
+     * @since   0.0.10
      * 
      * @link    http://codex.wordpress.org/Function_Reference/wp_enqueue_style
      */
     public function load_styles() {
 
         wp_register_style( 'river_admin_css', RIVER_ADMIN_URL . '/assets/css/river-admin.css' );
-        wp_register_style( 'jquery_timepicker_css', RIVER_ADMIN_URL . '/assets/css/jquery.timepicker.css' ); 
 
-        wp_enqueue_style( 'river_admin_css' );
-        wp_enqueue_style( 'jquery_timepicker_css' );        
+        wp_enqueue_style( 'river_admin_css' );       
         
         // Media Uploader Stylesheet
         wp_enqueue_style( 'thickbox' );
